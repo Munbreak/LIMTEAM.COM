@@ -238,21 +238,13 @@ updateScore();
 // ---------- Save Review ----------
 async function saveReview(){
   if(!currentUser) return alert("Сначала зарегистрируйтесь!");
-
-  let coverURL = document.getElementById("coverPreview").src || "";
-
-  const file = coverInput.files[0];
-  if(file){
-    try {
-      const storageRef = storage.ref('covers/' + Date.now() + '_' + file.name);
-      await storageRef.put(file);
-      coverURL = await storageRef.getDownloadURL();
-    } catch(e){
-      alert("Ошибка загрузки обложки: " + e.message);
-      return;
-    }
+  let coverURL = document.getElementById("coverPreview").src||"";
+  if(coverURL.startsWith("data:")){
+    const file = coverInput.files[0];
+    const storageRef = storage.ref('covers/'+Date.now()+'_'+file.name);
+    await storageRef.put(file);
+    coverURL = await storageRef.getDownloadURL();
   }
-
   const review = {
     author: currentUser,
     artist: document.getElementById("artist").value.trim(),
@@ -263,16 +255,13 @@ async function saveReview(){
     total: parseInt(document.getElementById("total").innerText),
     awards:[...document.querySelectorAll(".award input")].map(inp=>inp.checked)
   };
-
-  if(editingIndex !== null){
+  if(editingIndex!==null){
     db.ref("reviews/"+editingIndex).set(review);
-    editingIndex = null;
+    editingIndex=null;
   } else {
     db.ref("reviews").push(review);
   }
-
   resetReviewForm();
-  alert("Рецензия успешно сохранена!");
 }
 
 // ---------- Reset Form ----------
