@@ -67,6 +67,9 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .profile-container input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;}
 .profile-container button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;}
 .profile-container button:hover{background:rgba(100,150,255,0.3);}
+#avatarPreview{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+#avatarPreview img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;}
+#avatarPlus{position:absolute;color:#aaa;font-size:12px;}
 @media(max-width:480px){.cover{width:140px;height:140px;}.review-container{padding:15px;}.block{padding:12px;}.result{font-size:36px;}.card .title{font-size:12px;}.card .score{font-size:14px;}}
 </style>
 </head>
@@ -112,8 +115,9 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 <div id="profile" class="page">
   <div class="profile-container">
     <div style="display:flex;align-items:center;gap:12px;">
-      <div id="avatarPreview" style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-        <span style="color:#aaa;font-size:12px;">+</span>
+      <div id="avatarPreview">
+        <span id="avatarPlus">+</span>
+        <img id="avatarImg">
       </div>
       <input type="file" id="avatarInput" hidden>
       <input type="text" id="username" placeholder="Введите имя" style="flex:1">
@@ -147,7 +151,6 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-// ---------- Firebase ----------
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "limteam-46e0f.firebaseapp.com",
@@ -174,8 +177,10 @@ avatarInput.addEventListener("change",(e)=>{
   if(!file) return;
   const reader = new FileReader();
   reader.onload = ()=>{
-    avatarPreview.style.backgroundImage = `url(${reader.result})`;
-    avatarPreview.innerHTML="";
+    const img = document.getElementById("avatarImg");
+    img.src = reader.result;
+    img.style.display = "block";
+    document.getElementById("avatarPlus").style.display = "none";
     localStorage.setItem("avatar", reader.result);
   }
   reader.readAsDataURL(file);
@@ -247,6 +252,7 @@ async function saveReview(){
   }
   const review = {
     author: currentUser,
+    avatar: localStorage.getItem("avatar") || "",
     artist: document.getElementById("artist").value.trim(),
     album: document.getElementById("album").value.trim(),
     cover: coverURL,
@@ -293,7 +299,14 @@ function renderTopReviews(entries){
     let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").join("");
     if(!badges) badges='<span>Нет номинаций</span>';
     card.dataset.key=key;
-    card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
+    card.innerHTML=`
+      <div class="rank">${i+1}</div>
+      ${r.cover ? `<img src="${r.cover}">` : `<div style="width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">?</div>`}
+      ${r.avatar ? `<img src="${r.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:6px;">` : ''}
+      <span class="title">${r.artist} — ${r.album}</span>
+      <div class="badges">${badges}</div>
+      <span class="score">${r.total}</span>
+    `;
     card.onclick=()=>showPreview(key,r);
     list.appendChild(card);
   });
@@ -317,7 +330,10 @@ function showPreview(key,r){
     <div class="meta">
       <input type="text" value="${r.artist}" disabled style="margin-bottom:4px;">
       <input type="text" value="${r.album}" disabled style="margin-bottom:4px;">
-      <div style="opacity:0.7;font-size:12px;margin-bottom:4px;">Автор: ${r.author}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;opacity:0.85;font-size:12px;">
+        ${r.avatar ? `<img src="${r.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">` : ''}
+        <span>Автор: ${r.author}</span>
+      </div>
       <div class="award-container">
         ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").join("") || '<span>Нет номинаций</span>'}
       </div>
@@ -366,8 +382,10 @@ window.addEventListener("load", ()=>{
     document.getElementById("welcomeMsg").innerText = `Привет, ${savedName}`;
   }
   if(savedAvatar){
-    avatarPreview.style.backgroundImage = `url(${savedAvatar})`;
-    avatarPreview.innerHTML="";
+    const img = document.getElementById("avatarImg");
+    img.src = savedAvatar;
+    img.style.display = "block";
+    document.getElementById("avatarPlus").style.display = "none";
   }
   loadReviews();
 });
