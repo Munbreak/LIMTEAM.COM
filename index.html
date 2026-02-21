@@ -72,39 +72,24 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .card .badges{display:flex;gap:4px;margin-left:5px;}
 .card .badges span{background:rgba(100,150,255,0.2);color:#fff;font-size:10px;font-weight:600;padding:2px 5px;border-radius:6px;}
 
-/* МОДАЛЬНОЕ ОКНО */
+/* МОДАЛЬНОЕ ОКНО РЕЦЕНЗИИ */
 #previewModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s;}
 #previewModal.show{opacity:1;pointer-events:auto;}
 #previewInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
 #previewModal.show #previewInner{transform:scale(1);}
 #previewInner .review-container{width:100%;position:relative;}
-#previewInner .author-info{position:absolute;top:auto;bottom:auto;left:0;display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;}
+#previewInner .author-info{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#fff;}
 
-/* ПРОФИЛЬ */
-.profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;position:relative;align-items:center;}
-.profile-container #profileAvatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);object-fit:cover;cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.6);}
-.profile-container #profileNick{font-weight:700;font-size:18px;margin-top:10px;}
-.profile-container button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;}
-.profile-container button:hover{background:rgba(100,150,255,0.3);}
-
-/* AUTH MODAL */
+/* МОДАЛКА АВТОРИЗАЦИИ */
 #authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:opacity 0.3s;}
 #authModal.show{opacity:1;pointer-events:auto;}
 #authInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:400px;width:90%;display:flex;flex-direction:column;gap:12px;box-shadow:0 0 40px rgba(0,0,0,0.7);}
 #authInner input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;}
-#authInner button.tab-btn{background:rgba(100,150,255,0.2);color:#fff;font-weight:600;margin-top:10px;}
-#authInner button.tab-btn.active{background:rgba(100,150,255,0.35);}
-#authInner #authAvatar{width:80px;height:80px;border-radius:50%;margin:auto;cursor:pointer;object-fit:cover;box-shadow:0 0 20px rgba(0,0,0,0.6);display:none;}
-
-/* Мобильная адаптация */
-@media(max-width:480px){
-  .cover{width:140px;height:140px;}
-  .review-container{padding:15px;}
-  .block{padding:12px;}
-  .result{font-size:36px;}
-  .card .title{font-size:12px;}
-  .card .score{font-size:14px;}
-}
+#authInner button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
+#authInner button:hover{background:rgba(100,150,255,0.35);}
+#authInner .tab-buttons{display:flex;gap:10px;justify-content:center;margin-bottom:12px;}
+#authInner .tab-buttons button.active{background:rgba(100,150,255,0.35);}
+#authInner .avatar-select{width:80px;height:80px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);margin:auto;cursor:pointer;object-fit:cover;box-shadow:0 0 20px rgba(0,0,0,0.6);}
 .version-label{position:fixed;bottom:5px;right:10px;font-size:12px;opacity:0.5;}
 </style>
 </head>
@@ -150,52 +135,85 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 <div id="profile" class="page">
   <div class="profile-container">
     <img id="profileAvatar" src="" alt="Аватар">
-    <div id="profileNick"></div>
-    <button id="authBtn" onclick="openAuthModal()">Вход / Регистрация</button>
+    <div id="profileName" style="text-align:center;margin-top:8px;font-weight:600;"></div>
+    <button id="loginBtn" onclick="authModal.classList.add('show')">Войти / Зарегистрироваться</button>
     <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
   </div>
 </div>
 
-<!-- Preview Modal -->
+<!-- Модалки -->
 <div id="previewModal">
   <div id="previewInner"></div>
 </div>
 
-<!-- Auth Modal -->
 <div id="authModal">
   <div id="authInner">
-    <img id="authAvatar" src="" alt="Аватар">
+    <div class="tab-buttons">
+      <button id="loginTab" class="tab-btn active">Вход</button>
+      <button id="registerTab" class="tab-btn">Регистрация</button>
+    </div>
+    <img id="authAvatar" class="avatar-select" style="display:none;">
     <input type="text" id="authNick" placeholder="Ник">
     <input type="password" id="authPassword" placeholder="Пароль">
-    <div style="display:flex;gap:10px;justify-content:center;">
-      <button class="tab-btn active" id="loginTabBtn">Вход</button>
-      <button class="tab-btn" id="registerTabBtn">Регистрация</button>
-    </div>
-    <button id="authSubmitBtn">Войти</button>
+    <button id="authSubmitBtn">Подтвердить</button>
   </div>
 </div>
 
-<div class="version-label">2.4</div>
+<div id="confirmModal">
+  <div id="confirmInner">
+    <div id="confirmText"></div>
+    <div style="display:flex;justify-content:center;gap:12px;margin-top:12px;">
+      <button id="confirmYes">Да</button>
+      <button id="confirmNo">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="version-label">2.5</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-const firebaseConfig = { apiKey: "YOUR_API_KEY", authDomain: "limteam-46e0f.firebaseapp.com", databaseURL: "https://limteam-46e0f-default-rtdb.firebaseio.com/", projectId: "limteam-46e0f", storageBucket: "limteam-46e0f.appspot.com", messagingSenderId: "YOUR_SENDER_ID", appId: "YOUR_APP_ID" };
+// ---------- Firebase ----------
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "limteam-46e0f.firebaseapp.com",
+  databaseURL: "https://limteam-46e0f-default-rtdb.firebaseio.com/",
+  projectId: "limteam-46e0f",
+  storageBucket: "limteam-46e0f.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
+const db = firebase.database();
 
-let currentUser=null, currentAvatar="", editingIndex=null;
+// ---------- Global ----------
+let editingIndex=null;
+let currentUser=null;
+let currentAvatar="";
+let currentKey=null;
 
+// ---------- Pages ----------
+function openPage(id,event){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(event) document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
+  if(event) event.currentTarget.classList.add("active");
+}
+
+// ---------- Cover ----------
 const coverInput=document.getElementById("coverInput");
-coverInput.addEventListener("change", e=>{
+coverInput.addEventListener("change", function(e){
   const reader=new FileReader();
-  reader.onload=()=>document.getElementById("coverPreview").src=reader.result;
+  reader.onload=function(){ document.getElementById("coverPreview").src=reader.result; }
   reader.readAsDataURL(e.target.files[0]);
 });
 
+// ---------- Profile Avatar ----------
 const profileAvatar=document.getElementById("profileAvatar");
-profileAvatar.addEventListener("click",()=>openAuthModal('register'));
 
+// ---------- Sliders ----------
 const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
 for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input",updateScore);
 function updateScore(){
@@ -242,6 +260,7 @@ function saveReview(){
   loadReviews();
 }
 
+// ---------- Reset Form ----------
 function resetReviewForm(){
   document.getElementById("coverPreview").src="";
   document.getElementById("text").value="";
@@ -260,13 +279,15 @@ function loadReviews(){
   });
 }
 
+// ---------- Render ----------
 function renderTopReviews(entries){
   const list=document.getElementById("home");
   list.innerHTML="";
   entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
     const card=document.createElement("div");
     card.className="card";
-    let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").join("");
+    let badges=r.awards.map((a,j)=>a?`<span>${["🖼","💿","🎬","🏆"][j]}</span>`:"").join("");
+    if(!badges) badges='';
     card.dataset.key=key;
     card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
     card.onclick=()=>showPreview(key,r);
@@ -279,8 +300,8 @@ const previewModal=document.getElementById("previewModal");
 const previewInner=document.getElementById("previewInner");
 
 function showPreview(key,r){
-  currentKey = key;
-  previewInner.innerHTML = `
+  currentKey=key;
+  previewInner.innerHTML=`
     <div class="review-container">
       <div class="top">
         <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
@@ -292,7 +313,7 @@ function showPreview(key,r){
             <span>${r.author}</span>
           </div>
           <div class="award-container">
-            ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").join("") || ''}
+            ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").join("")}
           </div>
         </div>
       </div>
@@ -305,10 +326,10 @@ function showPreview(key,r){
       </div>
     </div>
   `;
-  document.getElementById("editBtn").onclick = () => {
+  document.getElementById("editBtn").onclick = ()=>{
     previewModal.classList.remove('show');
     db.ref("reviews/"+currentKey).get().then(snap=>{
-      const r = snap.val();
+      const r=snap.val();
       editingIndex=currentKey;
       document.getElementById("coverPreview").src=r.cover;
       document.getElementById("text").value=r.text;
@@ -320,68 +341,72 @@ function showPreview(key,r){
       openPage('review');
     });
   }
-  document.getElementById("deleteBtn").onclick = () => {
-    if(!currentKey) return;
-    if(confirm("Вы точно хотите удалить эту рецензию?")){
-      db.ref("reviews/"+currentKey).remove();
-      previewModal.classList.remove('show');
-      loadReviews();
-    }
+  document.getElementById("deleteBtn").onclick = ()=>{
+    showConfirm("Вы точно хотите удалить эту рецензию?", function(res){
+      if(res) {
+        db.ref("reviews/"+currentKey).remove();
+        previewModal.classList.remove('show');
+        loadReviews();
+      }
+    });
   }
   previewModal.classList.add('show');
 }
 previewModal.addEventListener('click',e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
 
-// ---------- Pages ----------
-function openPage(id,event){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if(event) document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
-  if(event) event.currentTarget.classList.add("active");
+// ---------- Confirm ----------
+const confirmModal=document.getElementById("confirmModal");
+const confirmText=document.getElementById("confirmText");
+const confirmYes=document.getElementById("confirmYes");
+const confirmNo=document.getElementById("confirmNo");
+function showConfirm(message,callback){
+  confirmText.innerText=message;
+  confirmModal.classList.add("show");
+  confirmYes.onclick = ()=>{confirmModal.classList.remove("show"); callback(true);}
+  confirmNo.onclick = ()=>{confirmModal.classList.remove("show"); callback(false);}
 }
 
-// ---------- AUTH ----------
+// ---------- Auth Modal ----------
 const authModal=document.getElementById("authModal");
+const authInner=document.getElementById("authInner");
+const loginTab=document.getElementById("loginTab");
+const registerTab=document.getElementById("registerTab");
 const authAvatar=document.getElementById("authAvatar");
 const authNick=document.getElementById("authNick");
 const authPassword=document.getElementById("authPassword");
-const loginTabBtn=document.getElementById("loginTabBtn");
-const registerTabBtn=document.getElementById("registerTabBtn");
 const authSubmitBtn=document.getElementById("authSubmitBtn");
+const profileName=document.getElementById("profileName");
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
 
-let authMode="login"; // login / register
-
-function openAuthModal(mode){
-  authMode = mode||"login";
-  authModal.classList.add("show");
-  if(authMode==="register") authAvatar.style.display="block"; else authAvatar.style.display="none";
-  authSubmitBtn.innerText = authMode==="login"?"Войти":"Зарегистрироваться";
-  loginTabBtn.classList.toggle("active", authMode==="login");
-  registerTabBtn.classList.toggle("active", authMode==="register");
+loginTab.onclick=()=>{
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+  authAvatar.style.display="none";
+  authNick.value="";
+  authPassword.value="";
+}
+registerTab.onclick=()=>{
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+  authAvatar.style.display="block";
+  authNick.value="";
+  authPassword.value="";
 }
 
-loginTabBtn.onclick = ()=>openAuthModal("login");
-registerTabBtn.onclick = ()=>openAuthModal("register");
-
-authAvatar.addEventListener("click",()=>{
-  const file = document.createElement("input");
-  file.type="file";
-  file.click();
-  file.onchange = e=>{
-    const reader=new FileReader();
-    reader.onload=()=>authAvatar.src=reader.result;
-    reader.readAsDataURL(file.files[0]);
-  }
+authModal.addEventListener('click',e=>{
+  if(e.target===authModal) authModal.classList.remove('show');
 });
 
-authSubmitBtn.onclick = ()=>{
-  const nick=authNick.value.trim();
+// ---------- Auth Submit ----------
+authSubmitBtn.onclick=()=>{
+  const nick=authNick.value.trim().replace(/\s+/g,'');
   const pass=authPassword.value;
-  if(!nick||!pass) return alert("Введите ник и пароль!");
+  if(!nick||!pass)return alert("Заполните поля!");
   const nickKey="@"+nick;
   db.ref("users/"+nickKey).get().then(snap=>{
-    if(authMode==="login"){
-      if(!snap.exists() || snap.val().password!==pass) return alert("Неверный логин или пароль!");
+    if(loginTab.classList.contains("active")){
+      if(!snap.exists() || snap.val().password!==pass)return alert("Неверный логин/пароль!");
       currentUser=nickKey;
       currentAvatar=snap.val().avatar||"";
     } else {
@@ -389,35 +414,43 @@ authSubmitBtn.onclick = ()=>{
       currentAvatar=authAvatar.src||"";
       db.ref("users/"+nickKey).set({password:pass,avatar:currentAvatar});
     }
-    localStorage.setItem("currentUser", currentUser);
-    localStorage.setItem("currentAvatar", currentAvatar);
+    profileName.innerText=currentUser;
+    profileAvatar.src=currentAvatar;
+    loginBtn.style.display="none";
+    logoutBtn.style.display="block";
     authModal.classList.remove("show");
-    updateProfileUI();
+    openPage('review');
     loadReviews();
+    localStorage.setItem("currentUser",currentUser);
+    localStorage.setItem("currentAvatar",currentAvatar);
   });
 }
 
-function updateProfileUI(){
-  document.getElementById("profileNick").innerText=currentUser||"";
-  profileAvatar.src=currentAvatar||"";
-  document.getElementById("authBtn").style.display=currentUser?"none":"block";
-  document.getElementById("logoutBtn").style.display=currentUser?"block":"none";
-}
-
+// ---------- Logout ----------
 function logout(){
   currentUser=null;
   currentAvatar="";
+  profileName.innerText="";
+  profileAvatar.src="";
+  loginBtn.style.display="block";
+  logoutBtn.style.display="none";
   localStorage.removeItem("currentUser");
   localStorage.removeItem("currentAvatar");
-  updateProfileUI();
 }
 
 // ---------- Init ----------
 openPage('home');
-currentUser = localStorage.getItem("currentUser");
-currentAvatar = localStorage.getItem("currentAvatar");
-updateProfileUI();
 loadReviews();
+const savedUser=localStorage.getItem("currentUser");
+const savedAvatar=localStorage.getItem("currentAvatar");
+if(savedUser){
+  currentUser=savedUser;
+  currentAvatar=savedAvatar||"";
+  profileName.innerText=currentUser;
+  profileAvatar.src=currentAvatar;
+  loginBtn.style.display="none";
+  logoutBtn.style.display="block";
+}
 </script>
 </body>
 </html>
