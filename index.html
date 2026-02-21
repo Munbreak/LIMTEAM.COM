@@ -77,7 +77,8 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 #previewModal.show{opacity:1;pointer-events:auto;}
 #previewInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
 #previewModal.show #previewInner{transform:scale(1);}
-#previewInner .review-container{width:100%;}
+#previewInner .review-container{width:100%;position:relative;}
+#previewInner .author-info{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);opacity:0.6;text-align:center;font-size:12px;}
 
 /* Кастомное подтверждение удаления */
 #confirmModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
@@ -91,10 +92,11 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 #confirmNo:hover{background:rgba(100,150,255,0.3);}
 
 /* ПРОФИЛЬ */
-.profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;}
+.profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;position:relative;}
 .profile-container input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;}
 .profile-container button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;}
 .profile-container button:hover{background:rgba(100,150,255,0.3);}
+#profileAvatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);margin:auto;object-fit:cover;cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.6);}
 
 /* Мобильная адаптация */
 @media(max-width:480px){
@@ -105,6 +107,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   .card .title{font-size:12px;}
   .card .score{font-size:14px;}
 }
+.version-label{position:fixed;bottom:5px;right:10px;font-size:12px;opacity:0.5;}
 </style>
 </head>
 <body>
@@ -148,8 +151,12 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 
 <div id="profile" class="page">
   <div class="profile-container">
-    <input type="text" id="username" placeholder="Введите имя">
-    <button onclick="registerUser()">Зарегистрироваться / Войти</button>
+    <img id="profileAvatar" src="" alt="Аватар">
+    <input type="file" id="profileAvatarInput" hidden>
+    <input type="text" id="username" placeholder="Введите ник">
+    <input type="password" id="password" placeholder="Введите пароль">
+    <button id="loginBtn" onclick="showAuthModal()">Войти / Зарегистрироваться</button>
+    <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
     <div id="welcomeMsg" style="margin-top:8px;font-size:14px;opacity:0.7;"></div>
   </div>
 </div>
@@ -158,6 +165,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 <div id="previewModal">
   <div id="previewInner">
     <div class="review-container" id="previewContent"></div>
+    <div class="author-info" id="previewAuthor"></div>
     <div style="display:flex;justify-content:center;">
       <button id="editBtn">Изменить рецензию</button>
       <button id="deleteBtn">Удалить рецензию</button>
@@ -172,6 +180,8 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
     <button id="confirmNo">Отмена</button>
   </div>
 </div>
+
+<div class="version-label">TEST1</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -192,17 +202,8 @@ const db = firebase.database();
 
 // ---------- Global ----------
 let editingIndex=null;
-let currentUser="";
-
-// ---------- Registration ----------
-function registerUser(){
-  const name = document.getElementById("username").value.trim();
-  if(!name) return alert("Введите имя!");
-  currentUser = name;
-  document.getElementById("welcomeMsg").innerText = `Привет, ${name}`;
-  openPage('review');
-  loadReviews();
-}
+let currentUser=null;
+let currentAvatar="";
 
 // ---------- Pages ----------
 function openPage(id,event){
@@ -217,6 +218,16 @@ const coverInput=document.getElementById("coverInput");
 coverInput.addEventListener("change", function(e){
   const reader=new FileReader();
   reader.onload=function(){ document.getElementById("coverPreview").src=reader.result; }
+  reader.readAsDataURL(e.target.files[0]);
+});
+
+// ---------- Profile Avatar ----------
+const profileAvatar=document.getElementById("profileAvatar");
+const profileAvatarInput=document.getElementById("profileAvatarInput");
+profileAvatar.addEventListener("click",()=>profileAvatarInput.click());
+profileAvatarInput.addEventListener("change", e=>{
+  const reader=new FileReader();
+  reader.onload=()=>{profileAvatar.src=reader.result; currentAvatar=reader.result;}
   reader.readAsDataURL(e.target.files[0]);
 });
 
@@ -248,6 +259,7 @@ function saveReview(){
   if(!currentUser) return alert("Сначала зарегистрируйтесь!");
   const review = {
     author: currentUser,
+    avatar: currentAvatar,
     artist: document.getElementById("artist").value.trim(),
     album: document.getElementById("album").value.trim(),
     cover: document.getElementById("coverPreview").src||"",
@@ -263,6 +275,7 @@ function saveReview(){
     db.ref("reviews").push(review);
   }
   resetReviewForm();
+  loadReviews();
 }
 
 // ---------- Reset Form ----------
@@ -303,6 +316,7 @@ function renderTopReviews(entries){
 // ---------- Modal ----------
 const previewModal=document.getElementById("previewModal");
 const previewContent=document.getElementById("previewContent");
+const previewAuthor=document.getElementById("previewAuthor");
 const editBtn=document.getElementById("editBtn");
 const deleteBtn=document.getElementById("deleteBtn");
 const confirmModal=document.getElementById("confirmModal");
@@ -316,7 +330,6 @@ function showPreview(key,r){
     <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
     <div class="meta">
       <input type="text" value="${r.artist} — ${r.album}" disabled>
-      <input type="text" value="Автор: ${r.author}" disabled style="margin-top:4px;font-weight:600;">
       <div class="award-container">
         ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").join("") || '<span>Нет номинаций</span>'}
       </div>
@@ -325,6 +338,7 @@ function showPreview(key,r){
   ${r.scores.map((s,i)=>`<div class="block ${i===4?'vibe':''}"><div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div></div>`).join('')}
   <div class="result"><span>${r.total}</span><span class="small"> / 90</span></div>
   <textarea disabled>${r.text}</textarea>`;
+  previewAuthor.innerHTML=`<img src="${r.avatar||''}" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:5px;"> ${r.author}`;
   previewModal.classList.add('show');
 }
 
@@ -355,8 +369,42 @@ confirmYes.onclick=()=>{
 previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
 confirmModal.addEventListener('click', e=>{if(e.target===confirmModal) confirmModal.classList.remove('show');});
 
+// ---------- Auth ----------
+function showAuthModal(){
+  const nick=document.getElementById("username").value.trim().replace(/\s+/g,'');
+  const pass=document.getElementById("password").value;
+  if(!nick || !pass) return alert("Введите ник и пароль!");
+  const nickKey="@"+nick;
+  db.ref("users/"+nickKey).get().then(snap=>{
+    if(snap.exists()){
+      const user=snap.val();
+      if(user.password!==pass) return alert("Неверный пароль!");
+      currentUser=nickKey;
+      currentAvatar=user.avatar||"";
+      profileAvatar.src=currentAvatar;
+    } else {
+      currentUser=nickKey;
+      currentAvatar=currentAvatar||"";
+      db.ref("users/"+nickKey).set({password:pass,avatar:currentAvatar});
+    }
+    document.getElementById("welcomeMsg").innerText=`Привет, ${currentUser}`;
+    document.getElementById("loginBtn").style.display="none";
+    document.getElementById("logoutBtn").style.display="block";
+    openPage('review');
+    loadReviews();
+  });
+}
+
+function logout(){
+  currentUser=null;
+  document.getElementById("welcomeMsg").innerText="";
+  document.getElementById("loginBtn").style.display="block";
+  document.getElementById("logoutBtn").style.display="none";
+}
+
 // ---------- Init ----------
 openPage('home');
+loadReviews();
 </script>
 </body>
 </html>
