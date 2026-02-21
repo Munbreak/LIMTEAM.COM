@@ -8,7 +8,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background: radial-gradient(circle at 20% 20%, #1b2233 0%, #0b0e14 40%, #05070c 100%);color:#e9edf7;overflow-x:hidden;display:flex;flex-direction:row;}
+body{font-family:'Inter',sans-serif;background: radial-gradient(circle at 20% 20%, #1b2233 0%, #0b0e14 40%, #05070c 100%);color:#e9edf7;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;}
 .menu{display:flex;flex-direction:column;width:60px;background:rgba(30,35,50,0.95);padding:20px 0;position:fixed;height:100vh;z-index:100;border-radius:0 12px 12px 0;box-shadow:2px 0 10px rgba(0,0,0,0.4);}
 .menu button{background:none;border:none;color:#aaa;font-size:20px;margin:10px 0;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:0.3s;}
 .menu button.active{color:#fff;}
@@ -36,59 +36,20 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;min-height:120px;resize:none;overflow:auto;}
 .save-btn{margin-top:15px;padding:10px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
 .save-btn:hover{background:rgba(255,255,255,0.1);}
-#editBtn,#deleteBtn{margin-top:15px;padding:10px 16px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:0.3s;}
-#editBtn{background:rgba(100,150,255,0.2);color:#fff;}
-#editBtn:hover{background:rgba(100,150,255,0.3);}
-#deleteBtn{background:rgba(255,50,50,0.2);color:#fff;margin-left:8px;}
-#deleteBtn:hover{background:rgba(255,50,50,0.3);}
-.card{background:rgba(18,22,30,0.85);border-radius:16px;padding:10px 12px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.3s ease;}
-.card:hover{transform:scale(1.02);}
-.card .rank{width:20px;text-align:center;font-weight:700;color:#fff;}
-.card img{width:40px;height:40px;border-radius:6px;object-fit:cover;}
-.card .title{font-weight:700;flex:1;font-size:14px;}
-.card .score{font-size:16px;font-weight:600;margin-left:8px;}
-.card .badges{display:flex;gap:4px;margin-left:5px;}
-.card .badges span{background:rgba(100,150,255,0.2);color:#fff;font-size:10px;font-weight:600;padding:2px 5px;border-radius:6px;}
-#previewModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s;}
-#previewModal.show{opacity:1;pointer-events:auto;}
-#previewInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
-#previewModal.show #previewInner{transform:scale(1);}
-#confirmModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
-#confirmModal.show{opacity:1;pointer-events:auto;}
-#confirmInner{background:rgba(30,35,50,0.95);padding:25px;border-radius:24px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 40px rgba(0,0,0,0.7);}
-#confirmInner p{margin-bottom:20px;font-size:16px;}
-#confirmInner button{padding:10px 20px;border:none;border-radius:12px;margin:0 10px;font-weight:600;cursor:pointer;transition:0.3s;}
-#confirmYes{background:rgba(255,50,50,0.2);color:#fff;}
-#confirmYes:hover{background:rgba(255,50,50,0.3);}
-#confirmNo{background:rgba(100,150,255,0.2);color:#fff;}
-#confirmNo:hover{background:rgba(100,150,255,0.3);}
-.profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;}
-.profile-container button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;}
-.profile-container button:hover{background:rgba(100,150,255,0.3);}
-#avatarPreview{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
-#avatarPreview img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:none;}
-#avatarPlus{position:absolute;color:#aaa;font-size:12px;}
-#authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:0.3s;z-index:400;}
-#authModal.show{opacity:1;pointer-events:auto;}
-#authModal > div{background:rgba(30,35,50,0.95);padding:25px;border-radius:24px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;}
-#authModal input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;}
-#authModal button{cursor:pointer;}
-@media(max-width:480px){.cover{width:140px;height:140px;}.review-container{padding:15px;}.block{padding:12px;}.result{font-size:36px;}.card .title{font-size:12px;}.card .score{font-size:14px;}}
+#version{margin-top:auto;text-align:center;font-size:12px;color:#888;padding:10px;}
+@media(max-width:480px){.cover{width:140px;height:140px;}.review-container{padding:15px;}.block{padding:12px;}.result{font-size:36px;}}
 </style>
 </head>
 <body>
 
-<!-- Меню -->
 <div class="menu">
   <button class="active" onclick="openPage('home',event)"><i class="fa-solid fa-house"></i></button>
   <button onclick="openPage('review',event)"><i class="fa-solid fa-star"></i></button>
   <button onclick="openPage('profile',event)"><i class="fa-solid fa-user"></i></button>
 </div>
 
-<!-- Главная страница -->
 <div id="home" class="page active"></div>
 
-<!-- Рецензии -->
 <div id="review" class="page">
   <div class="review-container">
     <div class="top">
@@ -118,7 +79,6 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   </div>
 </div>
 
-<!-- Профиль -->
 <div id="profile" class="page">
   <div class="profile-container">
     <div style="display:flex;align-items:center;gap:12px;flex-direction:column;">
@@ -134,41 +94,8 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   </div>
 </div>
 
-<!-- Модалки: preview, confirm, auth -->
-<div id="previewModal">
-  <div id="previewInner">
-    <div class="review-container" id="previewContent"></div>
-    <div style="display:flex;justify-content:center;">
-      <button id="editBtn">Изменить рецензию</button>
-      <button id="deleteBtn">Удалить рецензию</button>
-    </div>
-  </div>
-</div>
-<div id="confirmModal">
-  <div id="confirmInner">
-    <p>Вы действительно хотите удалить эту рецензию?</p>
-    <button id="confirmYes">Да, удалить</button>
-    <button id="confirmNo">Отмена</button>
-  </div>
-</div>
-<div id="authModal">
-  <div>
-    <h3 style="color:#fff;margin-bottom:12px;">Авторизация</h3>
-    <input type="text" id="authNick" placeholder="@ник">
-    <input type="password" id="authPass" placeholder="Пароль">
-    <div style="display:flex;justify-content:center;gap:10px;">
-      <button id="btnRegister">Регистрация</button>
-      <button id="btnLogin">Вход</button>
-    </div>
-    <span id="authMsg" style="color:#f55;font-size:14px;opacity:0.8;"></span>
-    <button onclick="closeAuth()" style="margin-top:10px;">Закрыть</button>
-  </div>
-</div>
+<div id="version">Версия 1.0.1.0</div>
 
-<!-- Версия сайта -->
-<div style="position:fixed;bottom:5px;right:10px;font-size:12px;color:#888;opacity:0.7;user-select:none;">Версия 1.0.1</div>
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
@@ -189,26 +116,8 @@ const db = firebase.database();
 const storage = firebase.storage();
 
 // ---------- Global ----------
-let editingIndex = null;
-let currentUser = "";
-
-// ---------- Load current user ----------
-window.addEventListener("load", ()=>{
-  const savedName = localStorage.getItem("nickname");
-  const savedAvatar = localStorage.getItem("avatar");
-  if(savedName){
-    currentUser = savedName;
-    document.getElementById("welcomeMsg").innerText = `Привет, ${savedName}`;
-  }
-  if(savedAvatar){
-    const img = document.getElementById("avatarImg");
-    img.src = savedAvatar;
-    img.style.display = "block";
-    document.getElementById("avatarPlus").style.display = "none";
-  }
-  loadReviews();
-});
-openPage('home');
+let editingIndex=null;
+let currentUser="";
 
 // ---------- Cover ----------
 const coverInput = document.getElementById("coverInput");
@@ -219,44 +128,48 @@ coverInput.addEventListener("change", function(e){
   reader.readAsDataURL(file);
 });
 
+// ---------- Pages ----------
+function openPage(id,event){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(event)document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
+  if(event)event.currentTarget.classList.add("active");
+}
+
+// ---------- Sliders ----------
+const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
+for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input",updateScore);
+function updateScore(){let base=0;for(let i=1;i<=4;i++){let v=parseInt(document.getElementById("s"+i).value);document.getElementById("v"+i).innerText=v;updateSliderProgress(document.getElementById("s"+i));base+=v;}let vibe=parseInt(document.getElementById("s5").value);document.getElementById("v5").innerText=vibe;updateSliderProgress(document.getElementById("s5"));let final=Math.round((base*1.4)*vibeMultipliers[vibe]);document.getElementById("total").innerText=final;}
+function updateSliderProgress(slider){let val=(slider.value-slider.min)/(slider.max-slider.min)*100;slider.style.background=`linear-gradient(to right, rgba(100,150,255,0.6) 0%, rgba(100,150,255,0.6) ${val}%, rgba(255,255,255,0.2) ${val}%, rgba(255,255,255,0.2) 100%)`;}
+updateScore();
+
 // ---------- Save Review ----------
 async function saveReview() {
-  if (!currentUser) { alert("Сначала зарегистрируйтесь!"); return; }
-
-  let coverURL = "";
+  if (!currentUser) return alert("Сначала зарегистрируйтесь!");
+  let coverURL = document.getElementById("coverPreview").src || "";
   const file = coverInput.files[0];
-
   if (file) {
     try {
       const storageRef = storage.ref('covers/' + Date.now() + '_' + file.name);
       await storageRef.put(file);
       coverURL = await storageRef.getDownloadURL();
-    } catch (e) { alert("Ошибка загрузки обложки: " + e.message); return; }
-  } else {
-    const prev = document.getElementById("coverPreview").src;
-    if(prev && !prev.startsWith("data:")) coverURL = prev;
-  }
-
+    } catch (e) { alert("Ошибка загрузки обложки: "+e.message); return; }
+  } else if (!coverURL || coverURL.startsWith("data:")) coverURL = "";
   const review = {
     author: currentUser,
-    avatar: localStorage.getItem("avatar") || "",
+    avatar: localStorage.getItem("avatar")||"",
     artist: document.getElementById("artist").value.trim(),
     album: document.getElementById("album").value.trim(),
     cover: coverURL,
-    scores: [...Array(5)].map((_, i) => parseInt(document.getElementById("s" + (i + 1)).value)),
+    scores: [...Array(5)].map((_, i) => parseInt(document.getElementById("s"+(i+1)).value)),
     text: document.getElementById("text").value,
     total: parseInt(document.getElementById("total").innerText),
     awards: [...document.querySelectorAll(".award input")].map(inp => inp.checked)
   };
-
-  try {
-    if (editingIndex !== null) {
-      await db.ref("reviews/" + editingIndex).set(review);
-      editingIndex = null;
-    } else { await db.ref("reviews").push(review); }
-    resetReviewForm();
-    alert("Рецензия успешно сохранена!");
-  } catch(e){ alert("Ошибка при сохранении: " + e.message); }
+  if(editingIndex!==null){ db.ref("reviews/"+editingIndex).set(review); editingIndex=null; }
+  else db.ref("reviews").push(review);
+  resetReviewForm(); loadReviews();
+  alert("Рецензия успешно сохранена!");
 }
 
 // ---------- Reset Form ----------
@@ -270,28 +183,37 @@ function resetReviewForm(){
   updateScore();
 }
 
-// ---------- Sliders ----------
-const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
-for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input",updateScore);
-function updateScore(){
-  let base=0;
-  for(let i=1;i<=4;i++){
-    let v=parseInt(document.getElementById("s"+i).value);
-    document.getElementById("v"+i).innerText=v;
-    updateSliderProgress(document.getElementById("s"+i));
-    base+=v;
-  }
-  let vibe=parseInt(document.getElementById("s5").value);
-  document.getElementById("v5").innerText=vibe;
-  updateSliderProgress(document.getElementById("s5"));
-  let final=Math.round((base*1.4)*vibeMultipliers[vibe]);
-  document.getElementById("total").innerText=final;
+// ---------- Load Reviews ----------
+function loadReviews(){
+  db.ref("reviews").on("value", snapshot=>{
+    const reviews = snapshot.val() || {};
+    renderTopReviews(Object.entries(reviews));
+  });
 }
-function updateSliderProgress(slider){
-  let val=(slider.value-slider.min)/(slider.max-slider.min)*100;
-  slider.style.background=`linear-gradient(to right, rgba(100,150,255,0.6) 0%, rgba(100,150,255,0.6) ${val}%, rgba(255,255,255,0.2) ${val}%, rgba(255,255,255,0.2) 100%)`;
+
+// ---------- Render ----------
+function renderTopReviews(entries){
+  const list=document.getElementById("home"); list.innerHTML="";
+  entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
+    const card=document.createElement("div");
+    card.className="card";
+    let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").join("");
+    if(!badges) badges='<span>Нет номинаций</span>';
+    card.dataset.key=key;
+    card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:`<div style="width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">?</div>`}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
+    list.appendChild(card);
+  });
 }
-updateScore();
+
+// ---------- Init ----------
+window.addEventListener("load", ()=>{
+  const savedName = localStorage.getItem("nickname");
+  const savedAvatar = localStorage.getItem("avatar");
+  if(savedName){ currentUser = savedName; document.getElementById("welcomeMsg").innerText = `Привет, ${savedName}`; }
+  if(savedAvatar){ const img = document.getElementById("avatarImg"); img.src = savedAvatar; img.style.display="block"; document.getElementById("avatarPlus").style.display="none"; }
+  loadReviews();
+});
+openPage('home');
 </script>
 
 </body>
