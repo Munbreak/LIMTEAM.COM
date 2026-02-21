@@ -278,15 +278,40 @@ updateScore();
 // ---------- Save Review ----------
 async function saveReview(){
   if(!currentUser) return alert("Сначала зарегистрируйтесь!");
-  let coverURL=document.getElementById("coverPreview").src||"";
-  if(coverURL.startsWith("data:")){
-    const file = coverInput.files[0];
-    const storageRef = storage.ref('covers/'+Date.now()+'_'+file.name);
-    await storageRef.put(file);
-    coverURL = await storageRef.getDownloadURL();
+
+  let coverURL = document.getElementById("coverPreview").src || "";
+  const file = coverInput.files[0];
+
+  if(file && coverURL.startsWith("data:")){
+    try{
+      const storageRef = storage.ref('covers/'+Date.now()+'_'+file.name);
+      await storageRef.put(file);
+      coverURL = await storageRef.getDownloadURL();
+    }catch(e){
+      alert("Ошибка загрузки обложки: "+e.message);
+      return;
+    }
   }
-  const review={author:currentUser,avatar:localStorage.getItem("avatar")||"",artist:document.getElementById("artist").value.trim(),album:document.getElementById("album").value.trim(),cover:coverURL,scores:[...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),text:document.getElementById("text").value,total:parseInt(document.getElementById("total").innerText),awards:[...document.querySelectorAll(".award input")].map(inp=>inp.checked)};
-  if(editingIndex!==null){db.ref("reviews/"+editingIndex).set(review);editingIndex=null;}else db.ref("reviews").push(review);
+
+  const review = {
+    author: currentUser,
+    avatar: localStorage.getItem("avatar")||"",
+    artist: document.getElementById("artist").value.trim(),
+    album: document.getElementById("album").value.trim(),
+    cover: coverURL,
+    scores: [...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),
+    text: document.getElementById("text").value,
+    total: parseInt(document.getElementById("total").innerText),
+    awards: [...document.querySelectorAll(".award input")].map(inp=>inp.checked)
+  };
+
+  if(editingIndex!==null){
+    db.ref("reviews/"+editingIndex).set(review);
+    editingIndex = null;
+  } else {
+    db.ref("reviews").push(review);
+  }
+
   resetReviewForm();
 }
 
