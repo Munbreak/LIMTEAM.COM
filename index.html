@@ -114,13 +114,16 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 
 <div id="profile" class="page">
   <div class="profile-container">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div id="avatarPreview">
-        <span id="avatarPlus">+</span>
-        <img id="avatarImg">
+    <div style="display:flex;align-items:center;gap:12px;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:12px;width:100%;">
+        <div id="avatarPreview">
+          <span id="avatarPlus">+</span>
+          <img id="avatarImg">
+        </div>
+        <input type="file" id="avatarInput" hidden>
+        <input type="text" id="username" placeholder="Имя пользователя" style="flex:1">
       </div>
-      <input type="file" id="avatarInput" hidden>
-      <input type="text" id="username" placeholder="Введите имя" style="flex:1">
+      <input type="password" id="password" placeholder="Пароль" style="width:100%;margin-top:8px;">
     </div>
     <button onclick="registerUser()">Зарегистрироваться / Войти</button>
     <div id="welcomeMsg" style="margin-top:8px;font-size:14px;opacity:0.7;"></div>
@@ -186,15 +189,33 @@ avatarInput.addEventListener("change",(e)=>{
   reader.readAsDataURL(file);
 });
 
-// ---------- Registration ----------
+// ---------- Registration / Login ----------
 function registerUser(){
   const name = document.getElementById("username").value.trim();
-  if(!name) return alert("Введите имя!");
-  currentUser = name;
-  localStorage.setItem("nickname", name);
-  document.getElementById("welcomeMsg").innerText = `Привет, ${name}`;
-  openPage('review');
-  loadReviews();
+  const pass = document.getElementById("password").value.trim();
+  if(!name || !pass) return alert("Введите имя и пароль!");
+
+  db.ref("users/"+name).get().then(snap=>{
+    const user = snap.val();
+    if(user){
+      if(user.password === pass){
+        currentUser = name;
+        localStorage.setItem("nickname", name);
+        document.getElementById("welcomeMsg").innerText = `Привет, ${name}`;
+        openPage('review');
+        loadReviews();
+      } else {
+        alert("Неверный пароль!");
+      }
+    } else {
+      db.ref("users/"+name).set({password: pass, avatar: localStorage.getItem("avatar")||""});
+      currentUser = name;
+      localStorage.setItem("nickname", name);
+      document.getElementById("welcomeMsg").innerText = `Привет, ${name}`;
+      openPage('review');
+      loadReviews();
+    }
+  });
 }
 
 // ---------- Pages ----------
@@ -302,7 +323,6 @@ function renderTopReviews(entries){
     card.innerHTML=`
       <div class="rank">${i+1}</div>
       ${r.cover ? `<img src="${r.cover}">` : `<div style="width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;">?</div>`}
-      ${r.avatar ? `<img src="${r.avatar}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:6px;">` : ''}
       <span class="title">${r.artist} — ${r.album}</span>
       <div class="badges">${badges}</div>
       <span class="score">${r.total}</span>
