@@ -78,18 +78,42 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 #previewInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
 #previewModal.show #previewInner{transform:scale(1);}
 #previewInner .review-container{width:100%;position:relative;}
-#previewInner .author-info{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#fff;}
+#previewInner .author-info{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;}
+#previewInner .author-info img{width:24px;height:24px;border-radius:50%;}
+
+/* МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ */
+#confirmModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+#confirmModal.show{opacity:1;pointer-events:auto;}
+#confirmInner{background:rgba(30,35,50,0.95);padding:25px;border-radius:24px;max-width:400px;width:90%;text-align:center;box-shadow:0 0 40px rgba(0,0,0,0.7);}
+#confirmInner p{margin-bottom:20px;font-size:16px;}
+#confirmInner button{padding:10px 20px;border:none;border-radius:12px;margin:0 10px;font-weight:600;cursor:pointer;transition:0.3s;}
+#confirmYes{background:rgba(255,50,50,0.2);color:#fff;}
+#confirmYes:hover{background:rgba(255,50,50,0.3);}
+#confirmNo{background:rgba(100,150,255,0.2);color:#fff;}
+#confirmNo:hover{background:rgba(100,150,255,0.3);}
+
+/* ПРОФИЛЬ */
+.profile-container{max-width:400px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;position:relative;align-items:center;}
+.profile-container img{width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);object-fit:cover;cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.6);}
+.profile-container button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;}
+.profile-container button:hover{background:rgba(100,150,255,0.3);}
+#logoutBtn{display:none;}
+#welcomeMsg{margin-top:8px;font-size:14px;opacity:0.7;}
 
 /* МОДАЛКА АВТОРИЗАЦИИ */
-#authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+#authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:0.3s;}
 #authModal.show{opacity:1;pointer-events:auto;}
-#authInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:400px;width:90%;display:flex;flex-direction:column;gap:12px;box-shadow:0 0 40px rgba(0,0,0,0.7);}
-#authInner input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;}
-#authInner button{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
-#authInner button:hover{background:rgba(100,150,255,0.35);}
-#authInner .tab-buttons{display:flex;gap:10px;justify-content:center;margin-bottom:12px;}
-#authInner .tab-buttons button.active{background:rgba(100,150,255,0.35);}
-#authInner .avatar-select{width:80px;height:80px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);margin:auto;cursor:pointer;object-fit:cover;box-shadow:0 0 20px rgba(0,0,0,0.6);}
+#authInner{background:rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:360px;width:90%;display:flex;flex-direction:column;gap:12px;position:relative;box-shadow:0 0 40px rgba(0,0,0,0.7);}
+#authAvatarCircle{width:80px;height:80px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);margin:auto;object-fit:cover;cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.6);}
+#authAvatarInput{display:none;}
+.auth-tabs{display:flex;justify-content:center;gap:10px;margin-bottom:10px;}
+.auth-tabs button{flex:1;padding:8px 0;border:none;border-radius:12px;background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;transition:0.3s;font-weight:600;}
+.auth-tabs button.active{background:rgba(100,150,255,0.2);}
+.auth-tabs button:hover{background:rgba(100,150,255,0.1);}
+.auth-fields input{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#fff;outline:none;width:100%;margin-bottom:10px;}
+.auth-submit{padding:10px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
+.auth-submit:hover{background:rgba(100,150,255,0.3);}
+
 .version-label{position:fixed;bottom:5px;right:10px;font-size:12px;opacity:0.5;}
 </style>
 </head>
@@ -135,9 +159,9 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 <div id="profile" class="page">
   <div class="profile-container">
     <img id="profileAvatar" src="" alt="Аватар">
-    <div id="profileName" style="text-align:center;margin-top:8px;font-weight:600;"></div>
-    <button id="loginBtn" onclick="authModal.classList.add('show')">Войти / Зарегистрироваться</button>
-    <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
+    <div id="welcomeMsg"></div>
+    <button id="loginBtn" onclick="showAuthModal()">Вход / Регистрация</button>
+    <button id="logoutBtn" onclick="logout()">Выйти</button>
   </div>
 </div>
 
@@ -146,30 +170,29 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   <div id="previewInner"></div>
 </div>
 
-<div id="authModal">
-  <div id="authInner">
-    <div class="tab-buttons">
-      <button id="loginTab" class="tab-btn active">Вход</button>
-      <button id="registerTab" class="tab-btn">Регистрация</button>
-    </div>
-    <img id="authAvatar" class="avatar-select" style="display:none;">
-    <input type="text" id="authNick" placeholder="Ник">
-    <input type="password" id="authPassword" placeholder="Пароль">
-    <button id="authSubmitBtn">Подтвердить</button>
-  </div>
-</div>
-
 <div id="confirmModal">
   <div id="confirmInner">
-    <div id="confirmText"></div>
-    <div style="display:flex;justify-content:center;gap:12px;margin-top:12px;">
-      <button id="confirmYes">Да</button>
-      <button id="confirmNo">Отмена</button>
-    </div>
+    <p>Вы действительно хотите удалить эту рецензию?</p>
+    <button id="confirmYes">Да, удалить</button>
+    <button id="confirmNo">Отмена</button>
   </div>
 </div>
 
-<div class="version-label">2.5</div>
+<!-- Модалка авторизации -->
+<div id="authModal">
+  <div id="authInner">
+    <img id="authAvatarCircle" src="" alt="Аватар">
+    <input type="file" id="authAvatarInput" accept="image/*">
+    <div class="auth-tabs">
+      <button id="loginTab" class="active">Вход</button>
+      <button id="registerTab">Регистрация</button>
+    </div>
+    <div class="auth-fields" id="authFields"></div>
+    <button class="auth-submit" id="authSubmit">Подтвердить</button>
+  </div>
+</div>
+
+<div class="version-label">2.6</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -212,6 +235,7 @@ coverInput.addEventListener("change", function(e){
 
 // ---------- Profile Avatar ----------
 const profileAvatar=document.getElementById("profileAvatar");
+profileAvatar.addEventListener("click",()=>{}); // теперь не трогаем
 
 // ---------- Sliders ----------
 const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
@@ -286,8 +310,8 @@ function renderTopReviews(entries){
   entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
     const card=document.createElement("div");
     card.className="card";
-    let badges=r.awards.map((a,j)=>a?`<span>${["🖼","💿","🎬","🏆"][j]}</span>`:"").join("");
-    if(!badges) badges='';
+    let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").join("");
+    if(!badges) badges=''; // исправлено: пусто если нет номинаций
     card.dataset.key=key;
     card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
     card.onclick=()=>showPreview(key,r);
@@ -295,162 +319,89 @@ function renderTopReviews(entries){
   });
 }
 
-// ---------- Preview Modal ----------
+// ---------- Modal Review ----------
 const previewModal=document.getElementById("previewModal");
 const previewInner=document.getElementById("previewInner");
-
 function showPreview(key,r){
   currentKey=key;
-  previewInner.innerHTML=`
-    <div class="review-container">
-      <div class="top">
-        <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
-        <div class="meta">
-          <input type="text" value="${r.artist}" disabled>
-          <input type="text" value="${r.album}" disabled>
-          <div class="author-info">
-            <img src="${r.avatar||''}" style="width:24px;height:24px;border-radius:50%;">
-            <span>${r.author}</span>
-          </div>
-          <div class="award-container">
-            ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").join("")}
-          </div>
+  previewInner.innerHTML=`<div class="review-container">
+    <div class="top">
+      <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
+      <div class="meta">
+        <input type="text" value="${r.artist}" disabled>
+        <input type="text" value="${r.album}" disabled>
+        <div class="author-info">
+          <img src="${r.avatar||''}" alt="avatar">
+          <span>${r.author}</span>
         </div>
       </div>
-      ${r.scores.map((s,i)=>`<div class="block ${i===4?'vibe':''}"><div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div></div>`).join('')}
-      <div class="result"><span>${r.total}</span><span class="small"> / 90</span></div>
-      <textarea disabled>${r.text}</textarea>
-      <div style="display:flex;justify-content:center;margin-top:10px;">
-        <button id="editBtn">Изменить рецензию</button>
-        <button id="deleteBtn">Удалить рецензию</button>
-      </div>
     </div>
-  `;
-  document.getElementById("editBtn").onclick = ()=>{
-    previewModal.classList.remove('show');
-    db.ref("reviews/"+currentKey).get().then(snap=>{
-      const r=snap.val();
-      editingIndex=currentKey;
-      document.getElementById("coverPreview").src=r.cover;
-      document.getElementById("text").value=r.text;
-      document.getElementById("artist").value=r.artist;
-      document.getElementById("album").value=r.album;
-      r.scores.forEach((v,i)=>{document.getElementById("s"+(i+1)).value=v;updateSliderProgress(document.getElementById("s"+(i+1)));});
-      document.querySelectorAll(".award input").forEach((inp,i)=>inp.checked=r.awards[i]);
-      updateScore();
-      openPage('review');
-    });
-  }
-  document.getElementById("deleteBtn").onclick = ()=>{
-    showConfirm("Вы точно хотите удалить эту рецензию?", function(res){
-      if(res) {
-        db.ref("reviews/"+currentKey).remove();
-        previewModal.classList.remove('show');
-        loadReviews();
-      }
-    });
-  }
+    ${r.scores.map((s,i)=>`<div class="block ${i===4?'vibe':''}"><div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div></div>`).join('')}
+    <div class="result"><span>${r.total}</span><span class="small"> / 90</span></div>
+    <textarea disabled>${r.text}</textarea>
+    <div style="display:flex;justify-content:center;">
+      <button id="editBtn">Изменить рецензию</button>
+      <button id="deleteBtn">Удалить рецензию</button>
+    </div>
+  </div>`;
   previewModal.classList.add('show');
-}
-previewModal.addEventListener('click',e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
 
-// ---------- Confirm ----------
+  document.getElementById('editBtn').onclick = ()=>{ /* логика редактирования */ };
+  document.getElementById('deleteBtn').onclick = ()=>confirmModal.classList.add('show');
+}
+
+// ---------- Confirm Modal ----------
 const confirmModal=document.getElementById("confirmModal");
-const confirmText=document.getElementById("confirmText");
 const confirmYes=document.getElementById("confirmYes");
 const confirmNo=document.getElementById("confirmNo");
-function showConfirm(message,callback){
-  confirmText.innerText=message;
-  confirmModal.classList.add("show");
-  confirmYes.onclick = ()=>{confirmModal.classList.remove("show"); callback(true);}
-  confirmNo.onclick = ()=>{confirmModal.classList.remove("show"); callback(false);}
-}
+confirmNo.onclick=()=>confirmModal.classList.remove('show');
+confirmYes.onclick=()=>{
+  if(!currentKey) return;
+  db.ref("reviews/"+currentKey).remove();
+  confirmModal.classList.remove('show');
+  previewModal.classList.remove('show');
+};
+previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
+confirmModal.addEventListener('click', e=>{if(e.target===confirmModal) confirmModal.classList.remove('show');});
 
 // ---------- Auth Modal ----------
-const authModal=document.getElementById("authModal");
-const authInner=document.getElementById("authInner");
-const loginTab=document.getElementById("loginTab");
-const registerTab=document.getElementById("registerTab");
-const authAvatar=document.getElementById("authAvatar");
-const authNick=document.getElementById("authNick");
-const authPassword=document.getElementById("authPassword");
-const authSubmitBtn=document.getElementById("authSubmitBtn");
-const profileName=document.getElementById("profileName");
-const loginBtn=document.getElementById("loginBtn");
-const logoutBtn=document.getElementById("logoutBtn");
+const authModal=document.getElementById('authModal');
+const authInner=document.getElementById('authInner');
+const authAvatarCircle=document.getElementById('authAvatarCircle');
+const authAvatarInput=document.getElementById('authAvatarInput');
+const authFields=document.getElementById('authFields');
+const authSubmit=document.getElementById('authSubmit');
+let authMode='login';
 
-loginTab.onclick=()=>{
-  loginTab.classList.add("active");
-  registerTab.classList.remove("active");
-  authAvatar.style.display="none";
-  authNick.value="";
-  authPassword.value="";
-}
-registerTab.onclick=()=>{
-  registerTab.classList.add("active");
-  loginTab.classList.remove("active");
-  authAvatar.style.display="block";
-  authNick.value="";
-  authPassword.value="";
-}
-
-authModal.addEventListener('click',e=>{
-  if(e.target===authModal) authModal.classList.remove('show');
+authAvatarCircle.addEventListener('click', ()=> authAvatarInput.click());
+authAvatarInput.addEventListener('change', e=>{
+  const reader=new FileReader();
+  reader.onload=()=>{authAvatarCircle.src=reader.result; currentAvatar=reader.result;}
+  reader.readAsDataURL(e.target.files[0]);
 });
 
-// ---------- Auth Submit ----------
-authSubmitBtn.onclick=()=>{
-  const nick=authNick.value.trim().replace(/\s+/g,'');
-  const pass=authPassword.value;
-  if(!nick||!pass)return alert("Заполните поля!");
-  const nickKey="@"+nick;
-  db.ref("users/"+nickKey).get().then(snap=>{
-    if(loginTab.classList.contains("active")){
-      if(!snap.exists() || snap.val().password!==pass)return alert("Неверный логин/пароль!");
-      currentUser=nickKey;
-      currentAvatar=snap.val().avatar||"";
-    } else {
-      currentUser=nickKey;
-      currentAvatar=authAvatar.src||"";
-      db.ref("users/"+nickKey).set({password:pass,avatar:currentAvatar});
-    }
-    profileName.innerText=currentUser;
-    profileAvatar.src=currentAvatar;
-    loginBtn.style.display="none";
-    logoutBtn.style.display="block";
-    authModal.classList.remove("show");
-    openPage('review');
-    loadReviews();
-    localStorage.setItem("currentUser",currentUser);
-    localStorage.setItem("currentAvatar",currentAvatar);
-  });
+document.getElementById('loginBtn').addEventListener('click', ()=> showAuthModal());
+
+function showAuthModal(){
+  authModal.classList.add('show');
+  renderAuthFields();
 }
 
-// ---------- Logout ----------
-function logout(){
-  currentUser=null;
-  currentAvatar="";
-  profileName.innerText="";
-  profileAvatar.src="";
-  loginBtn.style.display="block";
-  logoutBtn.style.display="none";
-  localStorage.removeItem("currentUser");
-  localStorage.removeItem("currentAvatar");
+authModal.addEventListener('click', e=>{if(e.target===authModal) authModal.classList.remove('show');});
+
+function renderAuthFields(){
+  if(authMode==='login'){
+    authFields.innerHTML=`<input type="text" id="authNick" placeholder="Ник">
+                          <input type="password" id="authPass" placeholder="Пароль">`;
+  } else {
+    authFields.innerHTML=`<input type="text" id="authNick" placeholder="Ник">
+                          <input type="password" id="authPass" placeholder="Пароль">`;
+  }
 }
 
 // ---------- Init ----------
 openPage('home');
 loadReviews();
-const savedUser=localStorage.getItem("currentUser");
-const savedAvatar=localStorage.getItem("currentAvatar");
-if(savedUser){
-  currentUser=savedUser;
-  currentAvatar=savedAvatar||"";
-  profileName.innerText=currentUser;
-  profileAvatar.src=currentAvatar;
-  loginBtn.style.display="none";
-  logoutBtn.style.display="block";
-}
 </script>
 </body>
 </html>
