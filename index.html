@@ -6,6 +6,7 @@
 <title>Марочного за творчество</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
+/* === Стили (оставлены без изменений) === */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background: radial-gradient(circle at 20% 20%, #1b2233 0%, #0b0e14 40%, #05070c 100%);color:#e9edf7;overflow-x:hidden;display:flex;flex-direction:row;}
@@ -275,44 +276,49 @@ function updateScore(){let base=0;for(let i=1;i<=4;i++){let v=parseInt(document.
 function updateSliderProgress(slider){let val=(slider.value-slider.min)/(slider.max-slider.min)*100;slider.style.background=`linear-gradient(to right, rgba(100,150,255,0.6) 0%, rgba(100,150,255,0.6) ${val}%, rgba(255,255,255,0.2) ${val}%, rgba(255,255,255,0.2) 100%)`;}
 updateScore();
 
-// ---------- Save Review ----------
-async function saveReview(){
-  if(!currentUser) return alert("Сначала зарегистрируйтесь!");
+// ---------- Save Review (исправлено) ----------
+async function saveReview() {
+  if (!currentUser) return alert("Сначала зарегистрируйтесь!");
 
   let coverURL = document.getElementById("coverPreview").src || "";
   const file = coverInput.files[0];
 
-  if(file && coverURL.startsWith("data:")){
-    try{
-      const storageRef = storage.ref('covers/'+Date.now()+'_'+file.name);
+  // Если есть новый файл (выбрали через input)
+  if (file) {
+    try {
+      const storageRef = storage.ref('covers/' + Date.now() + '_' + file.name);
       await storageRef.put(file);
       coverURL = await storageRef.getDownloadURL();
-    }catch(e){
-      alert("Ошибка загрузки обложки: "+e.message);
+    } catch (e) {
+      alert("Ошибка загрузки обложки: " + e.message);
       return;
     }
+  } else if (!coverURL || coverURL.startsWith("data:")) {
+    // Если нет файла и preview пустой или всё ещё dataURL — обложки нет
+    coverURL = "";
   }
 
   const review = {
     author: currentUser,
-    avatar: localStorage.getItem("avatar")||"",
+    avatar: localStorage.getItem("avatar") || "",
     artist: document.getElementById("artist").value.trim(),
     album: document.getElementById("album").value.trim(),
     cover: coverURL,
-    scores: [...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),
+    scores: [...Array(5)].map((_, i) => parseInt(document.getElementById("s" + (i + 1)).value)),
     text: document.getElementById("text").value,
     total: parseInt(document.getElementById("total").innerText),
-    awards: [...document.querySelectorAll(".award input")].map(inp=>inp.checked)
+    awards: [...document.querySelectorAll(".award input")].map(inp => inp.checked)
   };
 
-  if(editingIndex!==null){
-    db.ref("reviews/"+editingIndex).set(review);
+  if (editingIndex !== null) {
+    db.ref("reviews/" + editingIndex).set(review);
     editingIndex = null;
   } else {
     db.ref("reviews").push(review);
   }
 
   resetReviewForm();
+  alert("Рецензия успешно сохранена!");
 }
 
 // ---------- Reset Form ----------
