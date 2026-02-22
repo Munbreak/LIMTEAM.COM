@@ -61,20 +61,18 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .card .badges span{background:rgba(100,150,255,0.2);color:#fff;font-size:10px;font-weight:600;padding:2px 5px;border-radius:6px;}
 #previewModal, #authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:0.3s;}
 #previewModal.show, #authModal.show{opacity:1;pointer-events:auto;}
-#previewInner, #authInner {
-  background: rgba(18,22,30,0.95);
-  padding: 15px 20px;         /* чуть меньше внутренний отступ */
-  border-radius: 16px;
-  max-width: 400px;            /* ограничиваем ширину */
-  width: 90%;
-  max-height: 80vh;            /* чуть меньше по высоте */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;                   /* меньше расстояния между элементами */
-  box-shadow: 0 0 20px rgba(0,0,0,0.7);
-  transform: scale(0.9);       /* чуть меньше масштаб по умолчанию */
-  transition: all 0.2s ease;
+/* Только для модалки авторизации */
+#authInner {
+  max-width: 400px;   /* компактная ширина */
+  padding: 15px 20px;
+  border-radius: 15px;
+}
+
+/* Модалка рецензии остаётся широкой */
+#previewInner {
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 20px;
 }
 #previewModal.show #previewInner, #authModal.show #authInner{transform:scale(1);}
 #previewInner .author-info, #authInner .author-info{display:flex;align-items:center;gap:5px;font-size:12px;opacity:0.8;margin-top:5px;}
