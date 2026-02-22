@@ -3,29 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LimTeam Reviews v3.1b</title>
+<title>LimTeam Reviews v3.1 (дизайн 3.0)</title>
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#181818; color:#fff; }
-.menu { display:flex; gap:10px; padding:10px; background:#222; align-items:center; }
-.menu button { padding:5px 10px; cursor:pointer; background:#333; color:#fff; border:none; border-radius:3px; }
-.menu button.active { background:#69f; color:#fff; }
+body { margin:0; font-family: Arial, sans-serif; background:#121212; color:#fff; }
+.menu { display:flex; background:#1c1c1c; padding:10px; align-items:center; gap:10px; }
+.menu button { padding:5px 10px; background:#2a2a2a; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+.menu button.active { background:#3d5afe; }
 .page { display:none; padding:20px; }
 .page.active { display:block; }
-.card { border:1px solid #333; padding:10px; margin:10px 0; background:#222; cursor:pointer; display:flex; align-items:center; gap:10px; border-radius:5px; }
-.card img { width:50px; height:50px; object-fit:cover; border-radius:3px; }
-#coverPreview { width:100px; height:100px; object-fit:cover; display:block; margin-bottom:10px; border-radius:5px; }
-input,textarea,select { padding:5px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:3px; border:1px solid #555; background:#111; color:#fff; }
+.card { display:flex; align-items:center; background:#1f1f1f; margin:10px 0; padding:10px; border-radius:6px; cursor:pointer; transition:0.2s; }
+.card:hover { background:#2a2a2a; }
+.card img { width:50px; height:50px; object-fit:cover; border-radius:4px; margin-right:10px; }
+#coverPreview { width:100px; height:100px; object-fit:cover; margin-top:10px; border-radius:6px; display:block; }
+input,textarea { width:100%; padding:6px; margin:5px 0; border-radius:4px; border:1px solid #555; background:#1a1a1a; color:#fff; box-sizing:border-box; }
+.slider { width:100%; margin:5px 0; }
 #previewModal, #authModal, #customModal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1000; }
 #previewModal.show, #authModal.show, #customModal.show { display:flex; }
-.modal-content { background:#222; padding:20px; max-width:500px; width:90%; max-height:90%; overflow:auto; border-radius:5px; color:#fff; }
-.rank { font-weight:bold; margin-right:5px; }
-.badges span { margin-right:5px; font-size:0.9em; }
-.result { font-size:18px; font-weight:bold; margin-top:10px; }
-label.award { display:block; }
-.slider { width:100%; margin:5px 0; }
-button { cursor:pointer; }
+.modal-content { background:#1f1f1f; padding:20px; border-radius:6px; max-width:500px; width:90%; max-height:90%; overflow:auto; color:#fff; }
 #customModalContent { text-align:center; }
-#customModalContent button { margin:10px 5px; padding:5px 15px; border:none; border-radius:3px; background:#69f; color:#fff; font-weight:bold; }
+#customModalContent button { margin:10px 5px; padding:6px 12px; border:none; border-radius:4px; background:#3d5afe; color:#fff; cursor:pointer; }
+.author-info img { width:25px; height:25px; border-radius:50%; vertical-align:middle; margin-right:5px; }
+.badges span { font-size:0.85em; margin-right:4px; }
+.result { font-weight:bold; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -35,35 +34,35 @@ button { cursor:pointer; }
   <button onclick="openPage('review',event)">Новая рецензия</button>
   <button id="loginBtn" onclick="openAuthModal()">Войти</button>
   <button id="logoutBtn" onclick="logout()" style="display:none">Выйти</button>
-  <img id="profileAvatar" src="" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-left:10px;">
+  <img id="profileAvatar" src="" style="width:30px;height:30px;border-radius:50%;margin-left:10px;">
   <span id="profileNick"></span>
 </div>
 
 <div id="home" class="page active"></div>
 
 <div id="review" class="page">
-  <h2>Создать/редактировать рецензию</h2>
-  <label>Обложка:
-    <input type="file" id="coverInput">
-    <img id="coverPreview">
-  </label>
-  <label>Артист: <input type="text" id="artist"></label>
-  <label>Альбом: <input type="text" id="album"></label>
-  <label>Рифмы / Образы: <input type="range" id="s1" min="1" max="10" class="slider"><span id="v1">5</span></label>
-  <label>Структура / Ритмика: <input type="range" id="s2" min="1" max="10" class="slider"><span id="v2">5</span></label>
-  <label>Реализация стиля: <input type="range" id="s3" min="1" max="10" class="slider"><span id="v3">5</span></label>
-  <label>Индивидуальность / Харизма: <input type="range" id="s4" min="1" max="10" class="slider"><span id="v4">5</span></label>
-  <label>Атмосфера / Вайб: <input type="range" id="s5" min="1" max="10" class="slider"><span id="v5">5</span></label>
-  <div>Итог: <span id="total">0</span></div>
-  <label>Текст рецензии:<br><textarea id="text" rows="4"></textarea></label>
-  <div class="award-container">
-    <label class="award"><input type="checkbox"> 🖼 Обложка месяца</label>
-    <label class="award"><input type="checkbox"> 💿 Альбом месяца</label>
-    <label class="award"><input type="checkbox"> 🎬 Клип месяца</label>
-    <label class="award"><input type="checkbox"> 🏆 Альбом года</label>
-  </div>
-  <button onclick="saveReview()">Сохранить</button>
-  <button onclick="resetReviewForm()">Сбросить</button>
+<h2>Создать/редактировать рецензию</h2>
+<label>Обложка:
+  <input type="file" id="coverInput">
+  <img id="coverPreview">
+</label>
+<label>Артист: <input type="text" id="artist"></label>
+<label>Альбом: <input type="text" id="album"></label>
+<label>Рифмы / Образы: <input type="range" id="s1" min="1" max="10" class="slider"><span id="v1">5</span></label>
+<label>Структура / Ритмика: <input type="range" id="s2" min="1" max="10" class="slider"><span id="v2">5</span></label>
+<label>Реализация стиля: <input type="range" id="s3" min="1" max="10" class="slider"><span id="v3">5</span></label>
+<label>Индивидуальность / Харизма: <input type="range" id="s4" min="1" max="10" class="slider"><span id="v4">5</span></label>
+<label>Атмосфера / Вайб: <input type="range" id="s5" min="1" max="10" class="slider"><span id="v5">5</span></label>
+<div>Итог: <span id="total">0</span></div>
+<label>Текст рецензии:<br><textarea id="text" rows="4"></textarea></label>
+<div class="award-container">
+  <label class="award"><input type="checkbox"> 🖼 Обложка месяца</label>
+  <label class="award"><input type="checkbox"> 💿 Альбом месяца</label>
+  <label class="award"><input type="checkbox"> 🎬 Клип месяца</label>
+  <label class="award"><input type="checkbox"> 🏆 Альбом года</label>
+</div>
+<button onclick="saveReview()">Сохранить</button>
+<button onclick="resetReviewForm()">Сбросить</button>
 </div>
 
 <div id="previewModal">
@@ -110,10 +109,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ---------- Globals ----------
-let editingIndex=null;
-let currentUser=null;
-let currentAvatar="";
-let authTab = 'login';
+let editingIndex=null, currentUser=null, currentAvatar="", authTab='login';
 
 // ---------- Pages ----------
 function openPage(id,event){
@@ -123,19 +119,19 @@ function openPage(id,event){
   if(event) event.currentTarget.classList.add("active");
 }
 
-// ---------- Custom Alert / Confirm ----------
+// ---------- Custom Modal ----------
 function showCustom(msg,type='alert',callback){
-  const modal = document.getElementById("customModal");
-  const content = document.getElementById("customModalContent");
-  content.innerHTML = `<div>${msg}</div>`;
+  const modal=document.getElementById("customModal");
+  const content=document.getElementById("customModalContent");
+  content.innerHTML=`<div>${msg}</div>`;
   if(type==='confirm'){
-    const yes = document.createElement("button"); yes.innerText="Да";
-    const no = document.createElement("button"); no.innerText="Отмена";
+    const yes=document.createElement("button"); yes.innerText="Да";
+    const no=document.createElement("button"); no.innerText="Отмена";
     content.appendChild(yes); content.appendChild(no);
     yes.onclick=()=>{ modal.classList.remove("show"); callback(true); };
     no.onclick=()=>{ modal.classList.remove("show"); callback(false); };
   } else {
-    const ok = document.createElement("button"); ok.innerText="ОК";
+    const ok=document.createElement("button"); ok.innerText="ОК";
     content.appendChild(ok);
     ok.onclick=()=>{ modal.classList.remove("show"); if(callback)callback(); };
   }
@@ -144,11 +140,7 @@ function showCustom(msg,type='alert',callback){
 
 // ---------- Cover ----------
 const coverInput=document.getElementById("coverInput");
-coverInput.addEventListener("change", function(e){
-  const reader=new FileReader();
-  reader.onload=function(){ document.getElementById("coverPreview").src=reader.result; }
-  reader.readAsDataURL(e.target.files[0]);
-});
+coverInput.addEventListener("change", e=>{ const reader=new FileReader(); reader.onload=()=>document.getElementById("coverPreview").src=reader.result; reader.readAsDataURL(e.target.files[0]); });
 
 // ---------- Profile ----------
 const profileAvatar=document.getElementById("profileAvatar");
@@ -159,17 +151,9 @@ const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048
 for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input",updateScore);
 function updateScore(){
   let base=0;
-  for(let i=1;i<=4;i++){
-    let v=parseInt(document.getElementById("s"+i).value);
-    document.getElementById("v"+i).innerText=v;
-    updateSliderProgress(document.getElementById("s"+i));
-    base+=v;
-  }
-  let vibe=parseInt(document.getElementById("s5").value);
-  document.getElementById("v5").innerText=vibe;
-  updateSliderProgress(document.getElementById("s5"));
-  let final=Math.round((base*1.4)*vibeMultipliers[vibe]);
-  document.getElementById("total").innerText=final;
+  for(let i=1;i<=4;i++){ let v=parseInt(document.getElementById("s"+i).value); document.getElementById("v"+i).innerText=v; updateSliderProgress(document.getElementById("s"+i)); base+=v; }
+  let vibe=parseInt(document.getElementById("s5").value); document.getElementById("v5").innerText=vibe; updateSliderProgress(document.getElementById("s5"));
+  let final=Math.round((base*1.4)*vibeMultipliers[vibe]); document.getElementById("total").innerText=final;
 }
 function updateSliderProgress(slider){
   let val=(slider.value-slider.min)/(slider.max-slider.min)*100;
@@ -180,17 +164,11 @@ updateScore();
 // ---------- Save / Reset Review ----------
 function saveReview(){
   if(!currentUser) return showCustom("Сначала войдите!");
-  const review={
-    author:currentUser,
-    avatar:currentAvatar,
-    artist:document.getElementById("artist").value.trim(),
-    album:document.getElementById("album").value.trim(),
-    cover:document.getElementById("coverPreview").src||"",
-    scores:[...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),
-    text:document.getElementById("text").value,
-    total:parseInt(document.getElementById("total").innerText),
-    awards:[...document.querySelectorAll(".award input")].map(inp=>inp.checked)
-  };
+  const review={author:currentUser, avatar:currentAvatar, artist:document.getElementById("artist").value.trim(),
+  album:document.getElementById("album").value.trim(), cover:document.getElementById("coverPreview").src||"",
+  scores:[...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)), text:document.getElementById("text").value,
+  total:parseInt(document.getElementById("total").innerText),
+  awards:[...document.querySelectorAll(".award input")].map(inp=>inp.checked)};
   if(editingIndex!==null){ db.ref("reviews/"+editingIndex).set(review); editingIndex=null; }
   else db.ref("reviews").push(review);
   resetReviewForm(); loadReviews();
@@ -206,24 +184,16 @@ function resetReviewForm(){
 }
 
 // ---------- Load Reviews ----------
-function loadReviews(){
-  db.ref("reviews").on("value", snapshot=>{
-    const reviews = snapshot.val() || {};
-    renderTopReviews(Object.entries(reviews));
-  });
-}
+function loadReviews(){ db.ref("reviews").on("value", snap=>{ const reviews = snap.val()||{}; renderTopReviews(Object.entries(reviews)); }); }
 function renderTopReviews(entries){
-  const list=document.getElementById("home");
-  list.innerHTML="";
+  const list=document.getElementById("home"); list.innerHTML="";
   entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
-    const card=document.createElement("div");
-    card.className="card";
+    const card=document.createElement("div"); card.className="card";
     let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").filter(Boolean).join("");
     if(!badges) badges='<span>Нет номинаций</span>';
     card.dataset.key=key;
     card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
-    card.onclick=()=>showPreview(key,r);
-    list.appendChild(card);
+    card.onclick=()=>showPreview(key,r); list.appendChild(card);
   });
 }
 
@@ -236,39 +206,25 @@ let currentKey=null;
 function showPreview(key,r){
   currentKey=key;
   previewContent.innerHTML=`<div class="top">
-    <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
-    <div class="meta">
-      <input type="text" value="${r.artist}" disabled>
-      <input type="text" value="${r.album}" disabled>
-      <div class="author-info"><img src="${r.avatar||''}" style="width:25px;height:25px;border-radius:50%;vertical-align:middle;margin-right:5px;"> ${r.author}</div>
-      <div class="award-container">
-        ${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").filter(Boolean).join('') || '<span>Нет номинаций</span>'}
-      </div>
-    </div>
-  </div>
+  <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
+  <div class="meta">
+    <input type="text" value="${r.artist}" disabled>
+    <input type="text" value="${r.album}" disabled>
+    <div class="author-info"><img src="${r.avatar||''}"> ${r.author}</div>
+    <div class="award-container">${r.awards.map((a,j)=>a?`<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>`:"").filter(Boolean).join('') || '<span>Нет номинаций</span>'}</div>
+  </div></div>
   ${r.scores.map((s,i)=>`<div class="block ${i===4?'vibe':''}"><div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div></div>`).join('')}
   <div class="result"><span>${r.total}</span><span class="small"> / 90</span></div>
   <textarea disabled>${r.text}</textarea>`;
   previewModal.classList.add('show');
 }
-editBtn.onclick=()=>{
-  previewModal.classList.remove('show');
-  db.ref("reviews/"+currentKey).get().then(snap=>{
-    const r = snap.val();
-    editingIndex=currentKey;
-    document.getElementById("coverPreview").src=r.cover;
-    document.getElementById("text").value=r.text;
-    document.getElementById("artist").value=r.artist;
-    document.getElementById("album").value=r.album;
-    r.scores.forEach((v,i)=>{document.getElementById("s"+(i+1)).value=v; updateSliderProgress(document.getElementById("s"+(i+1)));});
-    document.querySelectorAll(".award input").forEach((inp,i)=>inp.checked=r.awards[i]);
-    updateScore(); openPage('review');
-  });
-}
-deleteBtn.onclick=()=>{
-  showCustom("Вы действительно хотите удалить эту рецензию?","confirm",res=>{if(res){db.ref("reviews/"+currentKey).remove(); previewModal.classList.remove('show');}});
-}
-previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
+editBtn.onclick=()=>{ previewModal.classList.remove('show'); db.ref("reviews/"+currentKey).get().then(snap=>{ const r=snap.val(); editingIndex=currentKey;
+  document.getElementById("coverPreview").src=r.cover; document.getElementById("text").value=r.text;
+  document.getElementById("artist").value=r.artist; document.getElementById("album").value=r.album;
+  r.scores.forEach((v,i)=>{document.getElementById("s"+(i+1)).value=v; updateSliderProgress(document.getElementById("s"+(i+1)));});
+  document.querySelectorAll(".award input").forEach((inp,i)=>inp.checked=r.awards[i]); updateScore(); openPage('review'); });}
+deleteBtn.onclick=()=>{ showCustom("Вы действительно хотите удалить эту рецензию?","confirm",res=>{if(res){db.ref("reviews/"+currentKey).remove(); previewModal.classList.remove('show');}});}
+previewModal.addEventListener('click',e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
 
 // ---------- Auth ----------
 const authModal=document.getElementById("authModal");
@@ -280,28 +236,16 @@ const loginBtnModal=document.getElementById("loginBtnModal");
 const registerBtnModal=document.getElementById("registerBtnModal");
 function openAuthModal(){ authModal.classList.add('show'); }
 authModal.addEventListener('click', e=>{if(e.target===authModal) authModal.classList.remove('show');});
-authAvatar.onclick = () => { if(authTab==='register') authFile.click(); }
+authAvatar.onclick=()=>{ if(authTab==='register') authFile.click(); }
 authFile.addEventListener("change",e=>{const reader=new FileReader();reader.onload=()=>authAvatar.src=reader.result;reader.readAsDataURL(e.target.files[0]);});
-function switchAuthTab(tab){
-  authTab = tab;
-  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
-  document.getElementById('tabRegister').classList.toggle('active', tab==='register');
-  loginBtnModal.style.display = tab==='login'?'block':'none';
-  registerBtnModal.style.display = tab==='register'?'block':'none';
-  authAvatar.style.display = tab==='register'?'inline-block':'none';
-}
+function switchAuthTab(tab){ authTab=tab; document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register'); loginBtnModal.style.display=tab==='login'?'block':'none'; registerBtnModal.style.display=tab==='register'?'block':'none'; authAvatar.style.display=tab==='register'?'inline-block':'none'; }
 
 function authLogin(){
-  if(authTab!=='login') return;
-  const nick = authNick.value.trim(); const pass = authPass.value;
+  if(authTab!=='login') return; const nick=authNick.value.trim(); const pass=authPass.value;
   if(!nick||!pass) return showCustom("Введите ник и пароль");
-  db.ref("users/@"+nick).get().then(snap=>{
-    if(!snap.exists()) return showCustom("Пользователь не найден");
-    const user = snap.val();
-    if(user.password!==pass) return showCustom("Неверный пароль");
-    currentUser="@"+nick; currentAvatar=user.avatar||"";
-    profileAvatar.src=currentAvatar; profileNick.innerText=nick;
-    authModal.classList.remove("show");
+  db.ref("users/@"+nick).get().then(snap=>{ if(!snap.exists()) return showCustom("Пользователь не найден"); const user=snap.val();
+    if(user.password!==pass) return showCustom("Неверный пароль"); currentUser="@"+nick; currentAvatar=user.avatar||"";
+    profileAvatar.src=currentAvatar; profileNick.innerText=nick; authModal.classList.remove("show");
     document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
     localStorage.setItem("user", currentUser); localStorage.setItem("avatar", currentAvatar);
     loadReviews();
@@ -309,17 +253,13 @@ function authLogin(){
 }
 
 function authRegister(){
-  if(authTab!=='register') return;
-  const nick = authNick.value.trim(); const pass = authPass.value;
+  if(authTab!=='register') return; const nick=authNick.value.trim(); const pass=authPass.value;
   if(!nick||!pass) return showCustom("Введите ник и пароль");
   if(!/^\w{3,20}$/.test(nick)) return showCustom("Ник должен быть 3-20 символов (буквы, цифры, _)");
   if(pass.length<6) return showCustom("Пароль должен быть не меньше 6 символов");
-  db.ref("users/@"+nick).get().then(snap=>{
-    if(snap.exists()) return showCustom("Пользователь с таким ником уже существует");
-    currentUser="@"+nick;
-    db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
-    profileAvatar.src=currentAvatar; profileNick.innerText=nick;
-    authModal.classList.remove("show");
+  db.ref("users/@"+nick).get().then(snap=>{ if(snap.exists()) return showCustom("Пользователь с таким ником уже существует");
+    currentUser="@"+nick; db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
+    profileAvatar.src=currentAvatar; profileNick.innerText=nick; authModal.classList.remove("show");
     document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
     localStorage.setItem("user", currentUser); localStorage.setItem("avatar", currentAvatar);
     loadReviews();
@@ -340,10 +280,8 @@ openPage('home'); loadReviews();
 if(localStorage.getItem("user")){
   currentUser=localStorage.getItem("user");
   currentAvatar=localStorage.getItem("avatar")||"";
-  profileAvatar.src=currentAvatar;
-  profileNick.innerText=currentUser.replace("@","");
-  document.getElementById("loginBtn").style.display="none";
-  document.getElementById("logoutBtn").style.display="block";
+  profileAvatar.src=currentAvatar; profileNick.innerText=currentUser.replace("@","");
+  document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
   loadReviews();
 }
 switchAuthTab('login');
