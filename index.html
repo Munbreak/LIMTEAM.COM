@@ -101,6 +101,40 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   gap: 10px; /* чтобы кнопки не слипались */
 }
 
+/* ===== PROFILE STATS ===== */
+.profile-stats{
+  display:flex;
+  gap:15px;
+  margin-top:15px;
+  width:100%;
+  justify-content:space-between;
+}
+
+.stat-item{
+  flex:1;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:12px;
+  border-radius:16px;
+  text-align:center;
+  transition:0.3s;
+  backdrop-filter:blur(10px);
+}
+
+.stat-item:hover{
+  transform:scale(1.05);
+  background:rgba(100,150,255,0.15);
+}
+
+.stat-value{
+  font-size:20px;
+  font-weight:700;
+}
+
+.stat-label{
+  font-size:12px;
+  opacity:0.6;
+}
 /* Модалка рецензии остаётся широкой */
 /* Модалка рецензии */
 #previewModal {
@@ -230,6 +264,23 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
     <img id="profileAvatar" src="" style="cursor:pointer;">
     <input type="file" id="profileAvatarInput" hidden>
     <div id="profileNick"></div>
+    <!-- ===== PROFILE STATS ===== -->
+<div class="profile-stats">
+  <div class="stat-item">
+    <div class="stat-value" id="statReviews">0</div>
+    <div class="stat-label">Рецензий</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-value" id="statAverage">0</div>
+    <div class="stat-label">Средний балл</div>
+  </div>
+
+  <div class="stat-item">
+    <div class="stat-value" id="statLevel">🎧</div>
+    <div class="stat-label">Статус</div>
+  </div>
+</div>
     <button id="loginBtn" onclick="openAuthModal()">Вход / Регистрация</button>
     <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
   </div>
@@ -368,6 +419,7 @@ function saveReview(){
   }
   resetReviewForm();
   loadReviews();
+  updateProfileStats();
 }
 
 function resetReviewForm(){
@@ -577,6 +629,7 @@ function authLogin(){
     localStorage.setItem("avatar", currentAvatar);
     showToast("Вход выполнен","success");
     loadReviews();
+    updateProfileStats();
   });
 }
 
@@ -607,6 +660,7 @@ function authRegister(){
     localStorage.setItem("avatar", currentAvatar);
     showToast("Регистрация успешна","success");
     loadReviews();
+    updateProfileStats();
   });
 }
 // ---------- LOGOUT ----------
@@ -620,11 +674,13 @@ function logout(){
   localStorage.removeItem("user");
   localStorage.removeItem("avatar");
   showToast("Вы вышли","success");
+  updateProfileStats();
 }
 
 // ---------- INIT ----------
 openPage('home');
 loadReviews();
+updateProfileStats();
 
 // ---------- LOAD SAVED USER ----------
 if(localStorage.getItem("user")){
@@ -666,6 +722,34 @@ authAvatarInput.addEventListener("change", e=>{
     currentAvatar = reader.result;
   };
   reader.readAsDataURL(e.target.files[0]);
+
+  // ===== PROFILE STATS SYSTEM =====
+function updateProfileStats(){
+  if(!currentUser){
+    document.getElementById("statReviews").innerText = 0;
+    document.getElementById("statAverage").innerText = 0;
+    document.getElementById("statLevel").innerText = "🎧";
+    return;
+  }
+
+  db.ref("reviews").get().then(snapshot=>{
+    const reviews = snapshot.val() || {};
+    const userReviews = Object.values(reviews).filter(r=>r.author===currentUser);
+
+    const count = userReviews.length;
+    const avg = count ? Math.round(userReviews.reduce((s,r)=>s+r.total,0)/count) : 0;
+
+    let level="🎧 Слушатель";
+    if(count>60) level="👑 Легенда";
+    else if(count>30) level="🏆 Эксперт";
+    else if(count>15) level="💿 Критик";
+    else if(count>5) level="🎤 Обозреватель";
+
+    document.getElementById("statReviews").innerText=count;
+    document.getElementById("statAverage").innerText=avg;
+    document.getElementById("statLevel").innerText=level;
+  });
+}
 
   // ---------- Смена аватарки профиля ----------
 const profileAvatar = document.getElementById("profileAvatar");
