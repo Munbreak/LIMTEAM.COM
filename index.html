@@ -269,7 +269,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
-<div class="version-label">3.6</div>
+<div class="version-label">4.0</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -461,12 +461,13 @@ function showPreview(key, r) {
   `;
 
   // Кнопки редактирования / удаления
-  if(currentUser !== r.author){
-    editBtn.style.display = "none";
-    deleteBtn.style.display = "none";
-  } else {
+   const isAdmin = currentUser === "@AlexMercer"; // <-- здесь указываем админа
+  if(isAdmin || currentUser === r.author){
     editBtn.style.display = "block";
     deleteBtn.style.display = "block";
+  } else {
+    editBtn.style.display = "none";
+    deleteBtn.style.display = "none";
   }
 
   previewModal.classList.add('show');
