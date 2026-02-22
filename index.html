@@ -373,6 +373,7 @@ function showCustomConfirm(message,callback){
 previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
 
 // ---------- AUTH ----------
+// ---------- AUTH ----------
 const authModal=document.getElementById("authModal");
 const authAvatar=document.getElementById("authAvatar");
 const authAvatarInput=document.getElementById("authAvatarInput");
@@ -381,6 +382,17 @@ const authPass=document.getElementById("authPass");
 const loginBtnModal=document.getElementById("loginBtnModal");
 const registerBtnModal=document.getElementById("registerBtnModal");
 
+// Применяем стиль сайта к полям
+[authNick, authPass].forEach(input=>{
+  input.style.background="rgba(255,255,255,0.04)";
+  input.style.border="1px solid rgba(255,255,255,0.08)";
+  input.style.padding="10px";
+  input.style.borderRadius="12px";
+  input.style.color="#fff";
+  input.style.fontSize="14px";
+});
+
+// Аватар
 authAvatar.addEventListener("click", ()=>authAvatarInput.click());
 authAvatarInput.addEventListener("change", e=>{
   const reader=new FileReader();
@@ -426,22 +438,33 @@ function authLogin(){
 
 function authRegister(){
   if(authTab!=='register') return;
-  const nick = authNick.value.trim();
+  let nick = authNick.value.trim();
   const pass = authPass.value;
   if(!nick || !pass) return showToast("Введите ник и пароль","error");
-  currentUser="@"+nick;
-  db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
-  profileAvatar.src=currentAvatar;
-  profileNick.innerText=nick;
-  authModal.classList.remove("show");
-  document.getElementById("loginBtn").style.display="none";
-  document.getElementById("logoutBtn").style.display="block";
-  localStorage.setItem("user", currentUser);
-  localStorage.setItem("avatar", currentAvatar);
-  showToast("Регистрация успешна","success");
-  loadReviews();
-}
 
+  // Проверка на пробелы
+  if(/\s/.test(nick)) return showToast("Ник не может содержать пробелы","error");
+
+  nick = nick.replace(/\s/g,''); // на всякий случай убрать пробелы
+  const userKey = "@"+nick;
+
+  // Проверяем, свободен ли ник
+  db.ref("users/"+userKey).get().then(snap=>{
+    if(snap.exists()) return showToast("Ник уже занят","error");
+
+    currentUser=userKey;
+    db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
+    profileAvatar.src=currentAvatar;
+    profileNick.innerText=nick;
+    authModal.classList.remove("show");
+    document.getElementById("loginBtn").style.display="none";
+    document.getElementById("logoutBtn").style.display="block";
+    localStorage.setItem("user", currentUser);
+    localStorage.setItem("avatar", currentAvatar);
+    showToast("Регистрация успешна","success");
+    loadReviews();
+  });
+}
 // ---------- LOGOUT ----------
 function logout(){
   currentUser=null;
