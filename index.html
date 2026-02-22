@@ -322,18 +322,17 @@ function showPreview(key, r) {
 
   const labels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
 
-  // Собираем awards
-  const awardsHTML = labels.map((label, j) => {
-    const checked = r.awards && r.awards[j] ? 'checked' : '';
-    return `<label class="award"><input type="checkbox" ${checked} disabled> ${checked ? label : ''}</label>`;
-  }).join('');
+  // Показываем только выбранные номинации
+  const awardsHTML = (r.awards || []).map((checked,j) => {
+    if(!checked) return '';
+    return `<label class="award"><input type="checkbox" checked disabled> ${labels[j]}</label>`;
+  }).filter(Boolean).join('');
 
-  // Собираем блоки оценок
+  // Блоки оценок без слайдеров
   const scoreLabels = ["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"];
   const scoresHTML = (r.scores || [0,0,0,0,0]).map((s,i) => `
     <div class="block ${i===4?'vibe':''}">
       <div class="label">${scoreLabels[i]} <span>${s}</span></div>
-      <input type="range" min="1" max="10" value="${s}" disabled>
     </div>
   `).join('');
 
@@ -348,7 +347,7 @@ function showPreview(key, r) {
           ${r.author || ''}
         </div>
         <div class="award-container">
-          ${awardsHTML}
+          ${awardsHTML || '<span>Нет номинаций</span>'}
         </div>
       </div>
     </div>
