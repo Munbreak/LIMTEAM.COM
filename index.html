@@ -252,7 +252,30 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
     <div class="block"><div class="label">Реализация стиля <span id="v3">5</span></div><input type="range" min="1" max="10" value="5" id="s3"></div>
     <div class="block"><div class="label">Индивидуальность / Харизма <span id="v4">5</span></div><input type="range" min="1" max="10" value="5" id="s4"></div>
     <div class="block vibe"><div class="label">Атмосфера / Вайб <span id="v5">5</span></div><input type="range" min="1" max="10" value="5" id="s5"></div>
-    <div class="result"><span id="total">28</span><span class="small"> / 90</span></div>
+    <div class="result" style="display:flex;align-items:center;justify-content:space-between;">
+  
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button id="likeBtn" style="
+      border:none;
+      background:rgba(255,255,255,0.05);
+      padding:6px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:600;
+    ">
+      ❤️ <span id="likeCount">${r.likes ? Object.keys(r.likes).length : 0}</span>
+    </button>
+  </div>
+
+  <div>
+    <span>${r.total || 0}</span><span class="small"> / 90</span>
+  </div>
+
+</div>
     <textarea id="text" placeholder="Текст рецензии"></textarea>
     <button class="save-btn" onclick="saveReview()">Сохранить рецензию</button>
   </div>
@@ -473,6 +496,13 @@ const deleteBtn=document.getElementById("deleteBtn");
 function showPreview(key, r) {
   currentKey = key;
 
+  db.ref("reviews/"+key+"/likes").on("value", snap=>{
+    const likes = snap.val() || {};
+    const count = Object.keys(likes).length;
+    const el = document.getElementById("likeCount");
+    if(el) el.innerText = count;
+  });
+
   const scoreLabels = ["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"];
   const awardsLabels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
 
@@ -524,6 +554,26 @@ function showPreview(key, r) {
   }
 
   previewModal.classList.add('show');
+  const likeBtn = document.getElementById("likeBtn");
+  const likeCount = document.getElementById("likeCount");
+
+  if(likeBtn){
+    likeBtn.onclick = () => {
+      if(!currentUser) return showToast("Сначала войдите!","error");
+
+      const likeRef = db.ref("reviews/"+currentKey+"/likes/"+currentUser);
+
+      likeRef.get().then(snap=>{
+        if(snap.exists()){
+        // Убираем лайк
+          likeRef.remove();
+        } else {
+        // Ставим лайк
+          likeRef.set(true);
+        }
+      });
+  }
+}
 }
 editBtn.onclick=()=>{
   previewModal.classList.remove('show');
@@ -777,7 +827,7 @@ function updateProfileStats(){
     if(count>60) level="👑 Легенда";
     else if(count>30) level="🏆 Эксперт";
     else if(count>15) level="💿 Критик";
-    else if(count>5) level="🎤 Обозреватель";
+    else if(count>0) level="🎤 Обозреватель";
 
     document.getElementById("statReviews").innerText=count;
     document.getElementById("statAverage").innerText=avg;
