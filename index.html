@@ -60,6 +60,21 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .card .badges{display:flex;gap:4px;margin-left:5px;flex-wrap:wrap;}
 .card .badges span{background:rgba(100,150,255,0.2);color:#fff;font-size:10px;font-weight:600;padding:2px 5px;border-radius:6px;}
 #previewModal, #authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:0.3s;}
+  /* Кнопка смены темы */
+#themeToggleBtn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(100,150,255,0.2);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#themeToggleBtn:hover {
+  background: rgba(100,150,255,0.3);
+}
 #previewModal.show, #authModal.show{opacity:1;pointer-events:auto;}
 /* Только для модалки авторизации */
 #authInner {
@@ -167,7 +182,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
     <div id="profileNick"></div>
     <button id="loginBtn" onclick="openAuthModal()">Вход / Регистрация</button>
     <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
-    <button onclick="toggleTheme()">💡 Тема</button>
+    <button id="themeToggleBtn" onclick="toggleTheme()">💡 Сменить тему</button>
   </div>
 </div>
 
