@@ -326,9 +326,7 @@ function showPreview(key,r){
       <input type="text" value="${r.album||''}" disabled>
       <div class="author-info"><img src="${r.avatar||''}" style="width:25px;height:25px;border-radius:50%;vertical-align:middle;margin-right:5px;"> ${r.author}</div>
       <div class="award-container">
-        ${(() => {
-    const awardsNames = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
-    return awardsNames.map((name,j)=> r.awards[j] ? `<label class="award"><input type="checkbox" checked disabled> ${name}</label>` : "").filter(Boolean).join('') || '<span>Нет номинаций</span>';
+      ${r.awards.map((a,j)=> a ? `<label class="award"><input type="checkbox" checked disabled> ${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</label>` : "").join('') || '<span>Нет номинаций</span>'}
 })()}
     </div>
   </div>
