@@ -61,7 +61,21 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .card .badges span{background:rgba(100,150,255,0.2);color:#fff;font-size:10px;font-weight:600;padding:2px 5px;border-radius:6px;}
 #previewModal, #authModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:0.3s;}
 #previewModal.show, #authModal.show{opacity:1;pointer-events:auto;}
-#previewInner, #authInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
+#previewInner, #authInner {
+  background: rgba(18,22,30,0.95);
+  padding: 15px 20px;         /* чуть меньше внутренний отступ */
+  border-radius: 16px;
+  max-width: 400px;            /* ограничиваем ширину */
+  width: 90%;
+  max-height: 80vh;            /* чуть меньше по высоте */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;                   /* меньше расстояния между элементами */
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  transform: scale(0.9);       /* чуть меньше масштаб по умолчанию */
+  transition: all 0.2s ease;
+}
 #previewModal.show #previewInner, #authModal.show #authInner{transform:scale(1);}
 #previewInner .author-info, #authInner .author-info{display:flex;align-items:center;gap:5px;font-size:12px;opacity:0.8;margin-top:5px;}
 .profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;align-items:center;position:relative;}
@@ -80,7 +94,26 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .tabs button.active{background:rgba(100,150,255,0.2);}
 .auth-buttons button{flex:1;margin-top:10px;padding:10px;border:none;border-radius:12px;color:#fff;background:rgba(100,150,255,0.2);cursor:pointer;}
 .auth-buttons button:hover{background:rgba(100,150,255,0.3);}
-.avatar-picker{width:60px;height:60px;border-radius:50%;object-fit:cover;margin:auto;cursor:pointer;display:block;background:linear-gradient(145deg,#1c2230,#11141b);}
+.avatar-picker {
+  width: 50px;    /* меньше аватар */
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: auto;
+  cursor: pointer;
+  display: block;
+  background: linear-gradient(145deg,#1c2230,#11141b);
+}
+
+/* Поля ввода */
+#authNick, #authPass {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 8px;       /* компактнее */
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+}
 @media(max-width:480px){
   .cover{width:140px;height:140px;}
   .review-container{padding:15px;}
@@ -157,10 +190,16 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
       <button class="active" id="tabLogin" onclick="switchAuthTab('login')">Вход</button>
       <button id="tabRegister" onclick="switchAuthTab('register')">Регистрация</button>
     </div>
+
+    <!-- Аватар для регистрации -->
     <img class="avatar-picker" id="authAvatar" src="" style="display:none;">
     <input type="file" id="authAvatarInput" hidden>
+
+    <!-- Поля ввода -->
     <input type="text" id="authNick" placeholder="Ник">
     <input type="password" id="authPass" placeholder="Пароль">
+
+    <!-- Кнопки -->
     <div class="auth-buttons">
       <button id="loginBtnModal" onclick="authLogin()">Вход</button>
       <button id="registerBtnModal" onclick="authRegister()">Регистрация</button>
@@ -415,22 +454,23 @@ previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewMo
 
 // ---------- AUTH ----------
 // ---------- AUTH ----------
-const authModal=document.getElementById("authModal");
-const authAvatar=document.getElementById("authAvatar");
-const authAvatarInput=document.getElementById("authAvatarInput");
-const authNick=document.getElementById("authNick");
-const authPass=document.getElementById("authPass");
-const loginBtnModal=document.getElementById("loginBtnModal");
-const registerBtnModal=document.getElementById("registerBtnModal");
-
-// Применяем стиль сайта к полям
 [authNick, authPass].forEach(input=>{
   input.style.background="rgba(255,255,255,0.04)";
   input.style.border="1px solid rgba(255,255,255,0.08)";
-  input.style.padding="10px";
-  input.style.borderRadius="12px";
+  input.style.padding="8px";       // компактнее
+  input.style.borderRadius="10px";
   input.style.color="#fff";
-  input.style.fontSize="14px";
+  input.style.fontSize="13px";     // меньше шрифт
+});
+
+authAvatar.addEventListener("click", ()=>authAvatarInput.click());
+authAvatarInput.addEventListener("change", e=>{
+  const reader = new FileReader();
+  reader.onload = function() {
+    authAvatar.src = reader.result;
+    currentAvatar = reader.result;
+  };
+  reader.readAsDataURL(e.target.files[0]);
 });
 
 // Аватар
