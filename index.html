@@ -288,16 +288,25 @@ function loadReviews(){
 }
 
 function renderTopReviews(entries){
-  const list=document.getElementById("home");
-  list.innerHTML="";
-  entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
-    const card=document.createElement("div");
-    card.className="card";
-    let badges = r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").filter(Boolean).join("");
-    if(!badges) badges='<span>Нет номинаций</span>';
-    card.dataset.key=key;
-    card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist||""} — ${r.album||""}</span><div class="badges">${badges}</div><span class="score">${r.total||0}</span>`;
-    card.onclick=()=>showPreview(key,r);
+  const list = document.getElementById("home");
+  list.innerHTML = "";
+  const awardsNames = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
+  entries.sort((a,b)=>b[1].total - a[1].total).forEach(([key,r],i)=>{
+    const card = document.createElement("div");
+    card.className = "card";
+
+    let badges = awardsNames.map((name,j)=> r.awards[j] ? `<span>${name}</span>` : "").filter(Boolean).join("");
+    if(!badges) badges = '<span>Нет номинаций</span>';
+
+    card.dataset.key = key;
+    card.innerHTML = `
+      <div class="rank">${i+1}</div>
+      ${r.cover ? `<img src="${r.cover}">` : ""}
+      <span class="title">${r.artist || ""} — ${r.album || ""}</span>
+      <div class="badges">${badges}</div>
+      <span class="score">${r.total || 0}</span>
+    `;
+    card.onclick = () => showPreview(key, r);
     list.appendChild(card);
   });
 }
