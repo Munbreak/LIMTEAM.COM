@@ -63,58 +63,35 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 #previewModal.show, #authModal.show{opacity:1;pointer-events:auto;}
 #previewInner, #authInner{background: rgba(18,22,30,0.95);padding:20px;border-radius:20px;max-width:90%;width:90%;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:15px;box-shadow:0 0 40px rgba(0,0,0,0.7);transform:scale(0.8);transition:all 0.3s ease;}
 #previewModal.show #previewInner, #authModal.show #authInner{transform:scale(1);}
-
-/* ---------- Исправления для Auth Modal ---------- */
-#authInner{
-  width: 400px; 
-  max-width: 90%;
-  padding: 25px 20px;
-  gap: 15px;
-}
-#authInner input[type=text], #authInner input[type=password]{
-  width:100%;
-  padding:12px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.05);
-  color:#fff;
-  font-size:14px;
-  transition:0.3s;
-}
-#authInner input[type=text]:focus, #authInner input[type=password]:focus{
-  outline:none;
-  border-color:rgba(100,150,255,0.5);
-  background:rgba(255,255,255,0.1);
-}
-.auth-buttons button{
-  width:100%;
-  padding:12px 0;
-  border:none;
-  border-radius:12px;
-  background:rgba(100,150,255,0.2);
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.3s;
-  margin-top:8px;
-}
-.auth-buttons button:hover{
-  background:rgba(100,150,255,0.3);
-}
-.tabs button{
-  flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:none;
-  background:rgba(255,255,255,0.1);
-  color:#fff;
-  cursor:pointer;
-  transition:0.3s;
-}
+#previewInner .author-info, #authInner .author-info{display:flex;align-items:center;gap:5px;font-size:12px;opacity:0.8;margin-top:5px;}
+.profile-container{max-width:600px;width:100%;margin:auto;padding:20px;background:rgba(18,22,30,0.85);border-radius:20px;box-shadow:0 0 40px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;align-items:center;position:relative;}
+#profileAvatar{width:100px;height:100px;border-radius:50%;background:linear-gradient(145deg,#1c2230,#11141b);object-fit:cover;box-shadow:0 0 20px rgba(0,0,0,0.6);}
+#profileNick{font-weight:600;font-size:16px;}
+#loginBtn,#logoutBtn{padding:10px 16px;border:none;border-radius:12px;background:rgba(100,150,255,0.2);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
+#loginBtn:hover,#logoutBtn:hover{background:rgba(100,150,255,0.3);}
+.version-label{position:fixed;bottom:5px;right:10px;font-size:12px;opacity:0.5;}
+.toast-container{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:500;}
+.toast{padding:10px 16px;border-radius:12px;color:#fff;font-weight:600;background:rgba(100,150,255,0.9);box-shadow:0 0 20px rgba(0,0,0,0.4);animation:toastIn 0.3s forwards;opacity:0;}
+.toast.success{background:rgba(100,255,150,0.9);}
+.toast.error{background:rgba(255,100,100,0.9);}
+@keyframes toastIn{from{opacity:0;transform:translateX(50px);}to{opacity:1;transform:translateX(0);}}
+.tabs{display:flex;gap:10px;margin-bottom:10px;}
+.tabs button{flex:1;padding:10px;border-radius:12px;border:none;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;}
 .tabs button.active{background:rgba(100,150,255,0.2);}
+.auth-buttons button{flex:1;margin-top:10px;padding:10px;border:none;border-radius:12px;color:#fff;background:rgba(100,150,255,0.2);cursor:pointer;}
+.auth-buttons button:hover{background:rgba(100,150,255,0.3);}
 .avatar-picker{width:60px;height:60px;border-radius:50%;object-fit:cover;margin:auto;cursor:pointer;display:block;background:linear-gradient(145deg,#1c2230,#11141b);}
+@media(max-width:480px){
+  .cover{width:140px;height:140px;}
+  .review-container{padding:15px;}
+  .block{padding:12px;}
+  .result{font-size:36px;}
+  .card .title{font-size:12px;}
+  .card .score{font-size:14px;}
+}
 </style>
 <body>
+
 <div class="menu">
   <button class="active" onclick="openPage('home',event)"><i class="fa-solid fa-house"></i></button>
   <button onclick="openPage('review',event)"><i class="fa-solid fa-star"></i></button>
@@ -433,10 +410,17 @@ function authLogin(){
     if(!snap.exists()) return showToast("Пользователь не найден","error");
     const user = snap.val();
     if(user.password!==pass) return showToast("Неверный пароль","error");
-    currentUser = nick; currentAvatar = user.avatar||"";
+    currentUser="@"+nick;
+    currentAvatar=user.avatar||"";
+    profileAvatar.src=currentAvatar;
+    profileNick.innerText=nick;
+    authModal.classList.remove("show");
+    document.getElementById("loginBtn").style.display="none";
+    document.getElementById("logoutBtn").style.display="block";
+    localStorage.setItem("user", currentUser);
+    localStorage.setItem("avatar", currentAvatar);
     showToast("Вход выполнен","success");
-    updateProfileUI();
-    authModal.classList.remove('show');
+    loadReviews();
   });
 }
 
@@ -445,34 +429,52 @@ function authRegister(){
   const nick = authNick.value.trim();
   const pass = authPass.value;
   if(!nick || !pass) return showToast("Введите ник и пароль","error");
-  db.ref("users/@"+nick).get().then(snap=>{
-    if(snap.exists()) return showToast("Пользователь уже существует","error");
-    db.ref("users/@"+nick).set({password:pass, avatar:currentAvatar||""});
-    currentUser = nick;
-    showToast("Регистрация успешна","success");
-    updateProfileUI();
-    authModal.classList.remove('show');
-  });
+  currentUser="@"+nick;
+  db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
+  profileAvatar.src=currentAvatar;
+  profileNick.innerText=nick;
+  authModal.classList.remove("show");
+  document.getElementById("loginBtn").style.display="none";
+  document.getElementById("logoutBtn").style.display="block";
+  localStorage.setItem("user", currentUser);
+  localStorage.setItem("avatar", currentAvatar);
+  showToast("Регистрация успешна","success");
+  loadReviews();
 }
 
+// ---------- LOGOUT ----------
 function logout(){
-  currentUser=null; currentAvatar="";
-  updateProfileUI();
+  currentUser=null;
+  currentAvatar="";
+  profileAvatar.src="";
+  profileNick.innerText="";
+  document.getElementById("loginBtn").style.display="block";
+  document.getElementById("logoutBtn").style.display="none";
+  localStorage.removeItem("user");
+  localStorage.removeItem("avatar");
+  showToast("Вы вышли","success");
 }
 
-function updateProfileUI(){
-  document.getElementById("profileNick").innerText = currentUser||"Гость";
-  document.getElementById("profileAvatar").src=currentAvatar||"https://via.placeholder.com/60";
-  document.getElementById("loginBtn").style.display = currentUser? "none":"block";
-  document.getElementById("logoutBtn").style.display = currentUser? "block":"none";
+// ---------- INIT ----------
+openPage('home');
+loadReviews();
+
+// ---------- LOAD SAVED USER ----------
+if(localStorage.getItem("user")){
+  currentUser=localStorage.getItem("user");
+  currentAvatar=localStorage.getItem("avatar")||"";
+  profileAvatar.src=currentAvatar;
+  profileNick.innerText=currentUser.replace("@","");
+  document.getElementById("loginBtn").style.display="none";
+  document.getElementById("logoutBtn").style.display="block";
+  loadReviews();
 }
 
 // ---------- THEME ----------
 function toggleTheme(){ document.body.classList.toggle('light'); }
 
-// ---------- INIT ----------
-updateProfileUI();
-loadReviews();
+switchAuthTab('login');
 </script>
 </body>
 </html>
+
