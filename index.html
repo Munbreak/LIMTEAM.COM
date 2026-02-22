@@ -9,16 +9,58 @@
 </head>
 <body>
 
-<!-- ---------------- PAGES ---------------- -->
+<!-- ================== МЕНЮ ================== -->
+<div class="menu">
+  <button onclick="openPage('home', event)">Главная</button>
+  <button onclick="openPage('review', event)">Оставить рецензию</button>
+</div>
+
+<!-- ================== PAGES ================== -->
 <div id="home" class="page active"></div>
-<div id="review" class="page"></div>
+<div id="review" class="page">
+  <input type="text" id="artist" placeholder="Исполнитель">
+  <input type="text" id="album" placeholder="Альбом">
+  <input type="file" id="coverInput">
+  <img id="coverPreview">
+  <textarea id="text" placeholder="Ваш отзыв"></textarea>
+  <div id="sliders">
+    <div><input type="range" id="s1" min="1" max="10" value="5"><span id="v1">5</span></div>
+    <div><input type="range" id="s2" min="1" max="10" value="5"><span id="v2">5</span></div>
+    <div><input type="range" id="s3" min="1" max="10" value="5"><span id="v3">5</span></div>
+    <div><input type="range" id="s4" min="1" max="10" value="5"><span id="v4">5</span></div>
+    <div><input type="range" id="s5" min="1" max="10" value="5"><span id="v5">5</span></div>
+  </div>
+  <div>Итог: <span id="total">0</span></div>
+  <div class="award">
+    <label><input type="checkbox"> 🖼 Обложка месяца</label>
+    <label><input type="checkbox"> 💿 Альбом месяца</label>
+    <label><input type="checkbox"> 🎬 Клип месяца</label>
+    <label><input type="checkbox"> 🏆 Альбом года</label>
+  </div>
+  <button onclick="saveReview()">Сохранить рецензию</button>
+</div>
 
-<!-- ---------------- MODALS ---------------- -->
-<div id="previewModal"></div>
-<div id="authModal"></div>
+<!-- ================== MODALS ================== -->
+<div id="previewModal" class="modal">
+  <div id="previewContent"></div>
+  <button id="editBtn">Редактировать</button>
+  <button id="deleteBtn">Удалить</button>
+</div>
 
-<!-- ---------------- PROFILE ---------------- -->
-<img id="profileAvatar">
+<div id="authModal" class="modal">
+  <div class="tabs">
+    <button id="tabLogin" onclick="switchAuthTab('login')">Войти</button>
+    <button id="tabRegister" onclick="switchAuthTab('register')">Регистрация</button>
+  </div>
+  <img id="authAvatar" src="">
+  <input type="text" id="authNick" placeholder="Ник">
+  <input type="file" id="authPass"> <!-- выбор аватара -->
+  <button id="loginBtnModal" onclick="authLogin()">Войти</button>
+  <button id="registerBtnModal" onclick="authRegister()">Зарегистрироваться</button>
+</div>
+
+<!-- ================== PROFILE ================== -->
+<img id="profileAvatar" src="">
 <span id="profileNick"></span>
 <button id="loginBtn" onclick="openAuthModal()">Войти</button>
 <button id="logoutBtn" onclick="logout()" style="display:none">Выйти</button>
@@ -35,36 +77,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ---------- Global ----------
-let editingIndex = null;
-let currentUser = null;
-let currentAvatar = "";
-let authTab = 'login'; // 'login' или 'register'
+// ================== GLOBAL ==================
+let editingIndex=null;
+let currentUser=null;
+let currentAvatar="";
+let authTab='login';
 
-// ---------- Pages ----------
-function openPage(id, event){
+// ================== PAGES ==================
+function openPage(id,event){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(event) document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
   if(event) event.currentTarget.classList.add("active");
 }
 
-// ---------- Cover ----------
-const coverInput = document.getElementById("coverInput");
-coverInput.addEventListener("change", function(e){
-  const reader = new FileReader();
-  reader.onload = ()=> document.getElementById("coverPreview").src = reader.result;
+// ================== COVER ==================
+const coverInput=document.getElementById("coverInput");
+coverInput.addEventListener("change", e=>{
+  const reader=new FileReader();
+  reader.onload=()=>document.getElementById("coverPreview").src=reader.result;
   reader.readAsDataURL(e.target.files[0]);
 });
 
-// ---------- Profile ----------
-const profileAvatar = document.getElementById("profileAvatar");
-const profileNick = document.getElementById("profileNick");
+// ================== PROFILE ==================
+const profileAvatar=document.getElementById("profileAvatar");
+const profileNick=document.getElementById("profileNick");
 
-// ---------- Sliders ----------
-const vibeMultipliers = {1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
-for(let i=1;i<=5;i++) document.getElementById("s"+i).addEventListener("input", updateScore);
-
+// ================== SLIDERS ==================
+const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
+for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input", updateScore);
 function updateScore(){
   let base=0;
   for(let i=1;i<=4;i++){
@@ -73,89 +114,85 @@ function updateScore(){
     updateSliderProgress(document.getElementById("s"+i));
     base+=v;
   }
-  let vibe = parseInt(document.getElementById("s5").value);
-  document.getElementById("v5").innerText = vibe;
+  let vibe=parseInt(document.getElementById("s5").value);
+  document.getElementById("v5").innerText=vibe;
   updateSliderProgress(document.getElementById("s5"));
-  let final = Math.round((base*1.4)*vibeMultipliers[vibe]);
-  document.getElementById("total").innerText = final;
+  let final=Math.round((base*1.4)*vibeMultipliers[vibe]);
+  document.getElementById("total").innerText=final;
 }
-
 function updateSliderProgress(slider){
-  let val = (slider.value-slider.min)/(slider.max-slider.min)*100;
-  slider.style.background = `linear-gradient(to right, rgba(100,150,255,0.6) 0%, rgba(100,150,255,0.6) ${val}%, rgba(255,255,255,0.2) ${val}%, rgba(255,255,255,0.2) 100%)`;
+  let val=(slider.value-slider.min)/(slider.max-slider.min)*100;
+  slider.style.background=`linear-gradient(to right, rgba(100,150,255,0.6) 0%, rgba(100,150,255,0.6) ${val}%, rgba(255,255,255,0.2) ${val}%, rgba(255,255,255,0.2) 100%)`;
 }
 updateScore();
 
-// ---------- Save Review ----------
+// ================== SAVE REVIEW ==================
 function saveReview(){
   if(!currentUser) return alert("Сначала войдите!");
-  const review = {
-    author: currentUser,
-    avatar: currentAvatar,
-    artist: document.getElementById("artist").value.trim(),
-    album: document.getElementById("album").value.trim(),
-    cover: document.getElementById("coverPreview").src||"",
-    scores: [...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),
-    text: document.getElementById("text").value,
-    total: parseInt(document.getElementById("total").innerText),
-    awards: [...document.querySelectorAll(".award input")].map(inp=>inp.checked)
+  const review={
+    author:currentUser,
+    avatar:currentAvatar,
+    artist:document.getElementById("artist").value.trim(),
+    album:document.getElementById("album").value.trim(),
+    cover:document.getElementById("coverPreview").src||"",
+    scores:[...Array(5)].map((_,i)=>parseInt(document.getElementById("s"+(i+1)).value)),
+    text:document.getElementById("text").value,
+    total:parseInt(document.getElementById("total").innerText),
+    awards:[...document.querySelectorAll(".award input")].map(inp=>inp.checked)
   };
-  if(editingIndex !== null){
+  if(editingIndex!==null){
     db.ref("reviews/"+editingIndex).set(review);
-    editingIndex = null;
-  } else {
-    db.ref("reviews").push(review);
-  }
+    editingIndex=null;
+  }else db.ref("reviews").push(review);
   resetReviewForm();
   loadReviews();
 }
 
-// ---------- Reset Form ----------
+// ================== RESET FORM ==================
 function resetReviewForm(){
-  document.getElementById("coverPreview").src = "";
-  coverInput.value = "";
-  document.getElementById("text").value = "";
-  document.getElementById("artist").value = "";
-  document.getElementById("album").value = "";
+  document.getElementById("coverPreview").src="";
+  coverInput.value="";
+  document.getElementById("text").value="";
+  document.getElementById("artist").value="";
+  document.getElementById("album").value="";
   for(let i=1;i<=5;i++){document.getElementById("s"+i).value=5;updateSliderProgress(document.getElementById("s"+i));}
   document.querySelectorAll(".award input").forEach(inp=>inp.checked=false);
   updateScore();
 }
 
-// ---------- Load Reviews ----------
+// ================== LOAD REVIEWS ==================
 function loadReviews(){
   db.ref("reviews").on("value", snapshot=>{
-    const reviews = snapshot.val() || {};
+    const reviews=snapshot.val()||{};
     renderTopReviews(Object.entries(reviews));
   });
 }
 
-// ---------- Render ----------
+// ================== RENDER ==================
 function renderTopReviews(entries){
   const list=document.getElementById("home");
   list.innerHTML="";
   entries.sort((a,b)=>b[1].total-a[1].total).forEach(([key,r],i)=>{
     const card=document.createElement("div");
     card.className="card";
-    let badges = r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").filter(Boolean).join("");
+    let badges=r.awards.map((a,j)=>a?`<span>${["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"][j]}</span>`:"").filter(Boolean).join("");
     if(!badges) badges='<span>Нет номинаций</span>';
-    card.dataset.key = key;
+    card.dataset.key=key;
     card.innerHTML=`<div class="rank">${i+1}</div>${r.cover?`<img src="${r.cover}">`:""}<span class="title">${r.artist} — ${r.album}</span><div class="badges">${badges}</div><span class="score">${r.total}</span>`;
-    card.onclick = ()=>showPreview(key,r);
+    card.onclick=()=>showPreview(key,r);
     list.appendChild(card);
   });
 }
 
-// ---------- Modal Review ----------
-const previewModal = document.getElementById("previewModal");
-const previewContent = document.getElementById("previewContent");
-const previewAuthor = document.getElementById("previewAuthor");
-const editBtn = document.getElementById("editBtn");
-const deleteBtn = document.getElementById("deleteBtn");
-let currentKey = null;
+// ================== MODALS ==================
+const previewModal=document.getElementById("previewModal");
+const previewContent=document.getElementById("previewContent");
+const editBtn=document.getElementById("editBtn");
+const deleteBtn=document.getElementById("deleteBtn");
+let currentKey=null;
 
 function showPreview(key,r){
-  currentKey = key;
+  currentKey=key;
   previewContent.innerHTML=`<div class="top">
     <div class="cover-wrapper"><img class="cover" src="${r.cover||''}"></div>
     <div class="meta">
@@ -173,15 +210,15 @@ function showPreview(key,r){
   previewModal.classList.add('show');
 }
 
-editBtn.onclick = ()=>{
+editBtn.onclick=()=>{
   previewModal.classList.remove('show');
   db.ref("reviews/"+currentKey).get().then(snap=>{
-    const r = snap.val();
-    editingIndex = currentKey;
-    document.getElementById("coverPreview").src = r.cover;
-    document.getElementById("text").value = r.text;
-    document.getElementById("artist").value = r.artist;
-    document.getElementById("album").value = r.album;
+    const r=snap.val();
+    editingIndex=currentKey;
+    document.getElementById("coverPreview").src=r.cover;
+    document.getElementById("text").value=r.text;
+    document.getElementById("artist").value=r.artist;
+    document.getElementById("album").value=r.album;
     r.scores.forEach((v,i)=>{document.getElementById("s"+(i+1)).value=v;updateSliderProgress(document.getElementById("s"+(i+1)));});
     document.querySelectorAll(".award input").forEach((inp,i)=>inp.checked=r.awards[i]);
     updateScore();
@@ -189,48 +226,48 @@ editBtn.onclick = ()=>{
   });
 }
 
-deleteBtn.onclick = ()=>{
+deleteBtn.onclick=()=>{
   if(!confirm("Вы действительно хотите удалить эту рецензию?")) return;
   db.ref("reviews/"+currentKey).remove();
   previewModal.classList.remove('show');
 }
 
-// ---------- Auth Modal ----------
-const authModal = document.getElementById("authModal");
-const authAvatar = document.getElementById("authAvatar");
-const authNick = document.getElementById("authNick");
-const authPass = document.getElementById("authPass");
-const loginBtnModal = document.getElementById("loginBtnModal");
-const registerBtnModal = document.getElementById("registerBtnModal");
+// ================== AUTH MODAL ==================
+const authModal=document.getElementById("authModal");
+const authAvatar=document.getElementById("authAvatar");
+const authNick=document.getElementById("authNick");
+const authPass=document.getElementById("authPass");
+const loginBtnModal=document.getElementById("loginBtnModal");
+const registerBtnModal=document.getElementById("registerBtnModal");
 
 function openAuthModal(){ authModal.classList.add('show'); }
 authModal.addEventListener('click', e=>{if(e.target===authModal) authModal.classList.remove('show');});
 
-// Вызов выбора аватарки только при регистрации
-authAvatar.addEventListener("click", ()=>{ if(authTab==='register') authPass.click(); });
+// Только регистрация выбирает аватарку
+authAvatar.addEventListener("click", ()=>{if(authTab==='register') authPass.click();});
 
 function switchAuthTab(tab){
-  authTab = tab;
+  authTab=tab;
   document.getElementById('tabLogin').classList.toggle('active', tab==='login');
   document.getElementById('tabRegister').classList.toggle('active', tab==='register');
-  loginBtnModal.style.display = tab==='login' ? 'block':'none';
-  registerBtnModal.style.display = tab==='register' ? 'block':'none';
+  loginBtnModal.style.display=tab==='login'?'block':'none';
+  registerBtnModal.style.display=tab==='register'?'block':'none';
 }
 
-// ---------- Login ----------
+// ================== LOGIN ==================
 function authLogin(){
   if(authTab!=='login') return;
-  const nick = authNick.value.trim();
-  const pass = authPass.value;
-  if(!nick || !pass) return alert("Введите ник и пароль");
+  const nick=authNick.value.trim();
+  const pass=authPass.value;
+  if(!nick||!pass) return alert("Введите ник и пароль");
   db.ref("users/@"+nick).get().then(snap=>{
     if(!snap.exists()) return alert("Пользователь не найден");
-    const user = snap.val();
+    const user=snap.val();
     if(user.password!==pass) return alert("Неверный пароль");
-    currentUser = "@"+nick;
-    currentAvatar = user.avatar || "";
-    profileAvatar.src = currentAvatar;
-    profileNick.innerText = nick;
+    currentUser="@"+nick;
+    currentAvatar=user.avatar||"";
+    profileAvatar.src=currentAvatar;
+    profileNick.innerText=nick;
     authModal.classList.remove("show");
     document.getElementById("loginBtn").style.display="none";
     document.getElementById("logoutBtn").style.display="block";
@@ -240,31 +277,31 @@ function authLogin(){
   });
 }
 
-// ---------- Register ----------
+// ================== REGISTER ==================
 function authRegister(){
   if(authTab!=='register') return;
-  const nick = authNick.value.trim();
-  const pass = authPass.value;
-  if(!nick || !pass) return alert("Введите ник и пароль");
+  const nick=authNick.value.trim();
+  const pass=authPass.value;
+  if(!nick||!pass) return alert("Введите ник и пароль");
   if(nick.length<3) return alert("Ник должен быть не меньше 3 символов");
   if(pass.length<5) return alert("Пароль должен быть не меньше 5 символов");
 
   db.ref("users/@"+nick).get().then(snap=>{
     if(snap.exists()) return alert("Пользователь с таким ником уже существует");
-    currentUser = "@"+nick;
-    db.ref("users/"+currentUser).set({password: pass, avatar: currentAvatar || ""});
-    profileAvatar.src = currentAvatar;
-    profileNick.innerText = nick;
+    currentUser="@"+nick;
+    db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar||""});
+    profileAvatar.src=currentAvatar;
+    profileNick.innerText=nick;
     authModal.classList.remove("show");
     document.getElementById("loginBtn").style.display="none";
     document.getElementById("logoutBtn").style.display="block";
     localStorage.setItem("user", currentUser);
-    localStorage.setItem("avatar", currentAvatar || "");
+    localStorage.setItem("avatar", currentAvatar||"");
     loadReviews();
   });
 }
 
-// ---------- Logout ----------
+// ================== LOGOUT ==================
 function logout(){
   currentUser=null;
   currentAvatar="";
@@ -276,22 +313,18 @@ function logout(){
   localStorage.removeItem("avatar");
 }
 
-// ---------- Init ----------
+// ================== INIT ==================
 openPage('home');
 loadReviews();
-
-// ---------- Load Saved User ----------
 if(localStorage.getItem("user")){
-  currentUser = localStorage.getItem("user");
-  currentAvatar = localStorage.getItem("avatar") || "";
-  profileAvatar.src = currentAvatar;
-  profileNick.innerText = currentUser.replace("@","");
+  currentUser=localStorage.getItem("user");
+  currentAvatar=localStorage.getItem("avatar")||"";
+  profileAvatar.src=currentAvatar;
+  profileNick.innerText=currentUser.replace("@","");
   document.getElementById("loginBtn").style.display="none";
   document.getElementById("logoutBtn").style.display="block";
   loadReviews();
 }
-
-// ---------- Initialize Auth Tab ----------
 switchAuthTab('login');
 </script>
 </body>
