@@ -244,47 +244,67 @@ function authLogin(){
   if(authTab!=='login') return; const nick=authNick.value.trim(); const pass=authPass.value;
   if(!nick||!pass) return showCustom("Введите ник и пароль");
   db.ref("users/@"+nick).get().then(snap=>{ if(!snap.exists()) return showCustom("Пользователь не найден"); const user=snap.val();
-    if(user.password!==pass) return showCustom("Неверный пароль"); currentUser="@"+nick; currentAvatar=user.avatar||"";
-    profileAvatar.src=currentAvatar; profileNick.innerText=nick; authModal.classList.remove("show");
-    document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
-    localStorage.setItem("user", currentUser); localStorage.setItem("avatar", currentAvatar);
+    if(user.password!==pass) return showCustom("Неверный пароль
+        currentUser = "@" + nick;
+    currentAvatar = user.avatar || "";
+    profileAvatar.src = currentAvatar;
+    profileNick.innerText = nick;
+    authModal.classList.remove("show");
+    document.getElementById("loginBtn").style.display = "none";
+    document.getElementById("logoutBtn").style.display = "block";
+    localStorage.setItem("user", currentUser);
+    localStorage.setItem("avatar", currentAvatar);
     loadReviews();
   });
 }
 
-function authRegister(){
-  if(authTab!=='register') return; const nick=authNick.value.trim(); const pass=authPass.value;
-  if(!nick||!pass) return showCustom("Введите ник и пароль");
-  if(!/^\w{3,20}$/.test(nick)) return showCustom("Ник должен быть 3-20 символов (буквы, цифры, _)");
-  if(pass.length<6) return showCustom("Пароль должен быть не меньше 6 символов");
-  db.ref("users/@"+nick).get().then(snap=>{ if(snap.exists()) return showCustom("Пользователь с таким ником уже существует");
-    currentUser="@"+nick; db.ref("users/"+currentUser).set({password:pass,avatar:currentAvatar});
-    profileAvatar.src=currentAvatar; profileNick.innerText=nick; authModal.classList.remove("show");
-    document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
-    localStorage.setItem("user", currentUser); localStorage.setItem("avatar", currentAvatar);
+function authRegister() {
+  if (authTab !== "register") return;
+  const nick = authNick.value.trim();
+  const pass = authPass.value;
+  if (!nick || !pass) return showCustom("Введите ник и пароль");
+  if (!/^\w{3,20}$/.test(nick)) return showCustom("Ник должен быть 3-20 символов (буквы, цифры, _)");
+  if (pass.length < 6) return showCustom("Пароль должен быть не меньше 6 символов");
+  db.ref("users/@"+nick).get().then(snap => {
+    if (snap.exists()) return showCustom("Пользователь с таким ником уже существует");
+    currentUser = "@" + nick;
+    db.ref("users/" + currentUser).set({ password: pass, avatar: currentAvatar });
+    profileAvatar.src = currentAvatar;
+    profileNick.innerText = nick;
+    authModal.classList.remove("show");
+    document.getElementById("loginBtn").style.display = "none";
+    document.getElementById("logoutBtn").style.display = "block";
+    localStorage.setItem("user", currentUser);
+    localStorage.setItem("avatar", currentAvatar);
     loadReviews();
   });
 }
 
 // ---------- Logout ----------
-function logout(){
-  currentUser=null; currentAvatar="";
-  profileAvatar.src=""; profileNick.innerText="";
-  document.getElementById("loginBtn").style.display="block";
-  document.getElementById("logoutBtn").style.display="none";
-  localStorage.removeItem("user"); localStorage.removeItem("avatar");
+function logout() {
+  currentUser = null;
+  currentAvatar = "";
+  profileAvatar.src = "";
+  profileNick.innerText = "";
+  document.getElementById("loginBtn").style.display = "block";
+  document.getElementById("logoutBtn").style.display = "none";
+  localStorage.removeItem("user");
+  localStorage.removeItem("avatar");
 }
 
 // ---------- Init ----------
-openPage('home'); loadReviews();
-if(localStorage.getItem("user")){
-  currentUser=localStorage.getItem("user");
-  currentAvatar=localStorage.getItem("avatar")||"";
-  profileAvatar.src=currentAvatar; profileNick.innerText=currentUser.replace("@","");
-  document.getElementById("loginBtn").style.display="none"; document.getElementById("logoutBtn").style.display="block";
+openPage("home");
+loadReviews();
+if (localStorage.getItem("user")) {
+  currentUser = localStorage.getItem("user");
+  currentAvatar = localStorage.getItem("avatar") || "";
+  profileAvatar.src = currentAvatar;
+  profileNick.innerText = currentUser.replace("@", "");
+  document.getElementById("loginBtn").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "block";
   loadReviews();
 }
-switchAuthTab('login');
+switchAuthTab("login");
 </script>
 </body>
 </html>
