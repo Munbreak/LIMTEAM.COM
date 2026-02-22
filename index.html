@@ -578,6 +578,32 @@ if(localStorage.getItem("user")){
 function toggleTheme(){ document.body.classList.toggle('light'); }
 
 switchAuthTab('login');
+
+// --- авторизация: стиль input ---
+authNick.style.background="rgba(255,255,255,0.04)";
+authNick.style.border="1px solid rgba(255,255,255,0.08)";
+authNick.style.padding="8px";
+authNick.style.borderRadius="10px";
+authNick.style.color="#fff";
+authNick.style.fontSize="13px";
+
+authPass.style.background="rgba(255,255,255,0.04)";
+authPass.style.border="1px solid rgba(255,255,255,0.08)";
+authPass.style.padding="8px";
+authPass.style.borderRadius="10px";
+authPass.style.color="#fff";
+authPass.style.fontSize="13px";
+
+// --- аватарка авторизации ---
+authAvatar.addEventListener("click", ()=>authAvatarInput.click());
+authAvatarInput.addEventListener("change", e=>{
+  const reader = new FileReader();
+  reader.onload = function() {
+    authAvatar.src = reader.result;
+    currentAvatar = reader.result;
+  };
+  reader.readAsDataURL(e.target.files[0]);
+});
 </script>
 </body>
 </html>
