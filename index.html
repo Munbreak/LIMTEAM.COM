@@ -225,12 +225,13 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 </div>
 
 <div id="profile" class="page">
+  <!-- Внутри блока профиля -->
   <div class="profile-container">
-    <img id="profileAvatar" src="">
+    <img id="profileAvatar" src="" style="cursor:pointer;">
+    <input type="file" id="profileAvatarInput" hidden>
     <div id="profileNick"></div>
     <button id="loginBtn" onclick="openAuthModal()">Вход / Регистрация</button>
     <button id="logoutBtn" onclick="logout()" style="display:none;">Выйти</button>
-    
   </div>
 </div>
 
@@ -665,6 +666,36 @@ authAvatarInput.addEventListener("change", e=>{
     currentAvatar = reader.result;
   };
   reader.readAsDataURL(e.target.files[0]);
+
+  // ---------- Смена аватарки профиля ----------
+const profileAvatar = document.getElementById("profileAvatar");
+const profileAvatarInput = document.getElementById("profileAvatarInput");
+
+// клик на аватар → открытие выбора файла
+profileAvatar.addEventListener("click", ()=>{
+  if(!currentUser) return showToast("Сначала войдите","error");
+  profileAvatarInput.click();
+});
+
+// загрузка нового аватара
+profileAvatarInput.addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    const newAvatar = reader.result;
+    profileAvatar.src = newAvatar;
+    currentAvatar = newAvatar;
+    // сохраняем в Firebase
+    if(currentUser){
+      db.ref("users/"+currentUser).update({avatar:newAvatar});
+      showToast("Аватар обновлён","success");
+      // обновляем рецензии текущего пользователя в списке, если нужно
+      loadReviews();
+    }
+  }
+  reader.readAsDataURL(file);
+});
 });
 </script>
 </body>
