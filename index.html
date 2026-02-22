@@ -691,6 +691,7 @@ if(localStorage.getItem("user")){
   document.getElementById("loginBtn").style.display="none";
   document.getElementById("logoutBtn").style.display="block";
   loadReviews();
+  updateProfileStats();
 }
 
 // ---------- THEME ----------
@@ -723,33 +724,7 @@ authAvatarInput.addEventListener("change", e=>{
   };
   reader.readAsDataURL(e.target.files[0]);
 
-  // ===== PROFILE STATS SYSTEM =====
-function updateProfileStats(){
-  if(!currentUser){
-    document.getElementById("statReviews").innerText = 0;
-    document.getElementById("statAverage").innerText = 0;
-    document.getElementById("statLevel").innerText = "🎧";
-    return;
-  }
 
-  db.ref("reviews").get().then(snapshot=>{
-    const reviews = snapshot.val() || {};
-    const userReviews = Object.values(reviews).filter(r=>r.author===currentUser);
-
-    const count = userReviews.length;
-    const avg = count ? Math.round(userReviews.reduce((s,r)=>s+r.total,0)/count) : 0;
-
-    let level="🎧 Слушатель";
-    if(count>60) level="👑 Легенда";
-    else if(count>30) level="🏆 Эксперт";
-    else if(count>15) level="💿 Критик";
-    else if(count>5) level="🎤 Обозреватель";
-
-    document.getElementById("statReviews").innerText=count;
-    document.getElementById("statAverage").innerText=avg;
-    document.getElementById("statLevel").innerText=level;
-  });
-}
 
   // ---------- Смена аватарки профиля ----------
 const profileAvatar = document.getElementById("profileAvatar");
@@ -781,6 +756,34 @@ profileAvatarInput.addEventListener("change", e=>{
   reader.readAsDataURL(file);
 });
 });
+
+// ===== PROFILE STATS SYSTEM =====
+function updateProfileStats(){
+  if(!currentUser){
+    document.getElementById("statReviews").innerText = 0;
+    document.getElementById("statAverage").innerText = 0;
+    document.getElementById("statLevel").innerText = "🎧";
+    return;
+  }
+
+  db.ref("reviews").get().then(snapshot=>{
+    const reviews = snapshot.val() || {};
+    const userReviews = Object.values(reviews).filter(r=>r.author===currentUser);
+
+    const count = userReviews.length;
+    const avg = count ? Math.round(userReviews.reduce((s,r)=>s+r.total,0)/count) : 0;
+
+    let level="🎧 Слушатель";
+    if(count>60) level="👑 Легенда";
+    else if(count>30) level="🏆 Эксперт";
+    else if(count>15) level="💿 Критик";
+    else if(count>5) level="🎤 Обозреватель";
+
+    document.getElementById("statReviews").innerText=count;
+    document.getElementById("statAverage").innerText=avg;
+    document.getElementById("statLevel").innerText=level;
+  });
+}
 </script>
 </body>
 </html>
