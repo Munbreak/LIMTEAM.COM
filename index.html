@@ -169,7 +169,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
-<div class="version-label">3.2</div>
+<div class="version-label">3.3</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -317,14 +317,22 @@ const previewContent=document.getElementById("previewContent");
 const editBtn=document.getElementById("editBtn");
 const deleteBtn=document.getElementById("deleteBtn");
 
-function showPreview(key,r){
+function showPreview(key, r) {
   currentKey = key;
 
   // Собираем awards — пустые строки вместо undefined
-  const awardsHTML = r.awards.map((a,j)=>{
+  const awardsHTML = r.awards.map((a, j) => {
     const labels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
     return `<label class="award"><input type="checkbox" ${a?'checked':''} disabled> ${a ? labels[j] : ''}</label>`;
   }).join('');
+
+  // Собираем блоки с оценками
+  const scoresHTML = r.scores.map((s,i) => `
+    <div class="block ${i===4?'vibe':''}">
+      <div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div>
+      <input type="range" min="1" max="10" value="${s}" disabled>
+    </div>
+  `).join('');
 
   previewContent.innerHTML = `
     <div class="top">
@@ -332,18 +340,18 @@ function showPreview(key,r){
       <div class="meta">
         <input type="text" value="${r.artist||''}" disabled>
         <input type="text" value="${r.album||''}" disabled>
-        <div class="author-info"><img src="${r.avatar||''}" style="width:25px;height:25px;border-radius:50%;vertical-align:middle;margin-right:5px;"> ${r.author}</div>
+        <div class="author-info"><img src="${r.avatar||''}" style="width:25px;height:25px;border-radius:50%;vertical-align:middle;margin-right:5px;"> ${r.author||''}</div>
         <div class="award-container">
           ${awardsHTML}
         </div>
       </div>
     </div>
-    ${r.scores.map((s,i)=>`<div class="block ${i===4?'vibe':''}"><div class="label">${["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"][i]} <span>${s}</span></div></div>`).join('')}
-    <div class="result"><span>${r.total}</span><span class="small"> / 90</span></div>
+    ${scoresHTML}
+    <div class="result"><span>${r.total||0}</span><span class="small"> / 90</span></div>
     <textarea disabled>${r.text||''}</textarea>
   `;
 
-  if(currentUser!==r.author){
+  if(currentUser !== r.author){
     editBtn.style.display="none";
     deleteBtn.style.display="none";
   } else {
