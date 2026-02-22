@@ -9,13 +9,13 @@
 </head>
 <body>
 
-<!-- ================== МЕНЮ ================== -->
+<!-- МЕНЮ -->
 <div class="menu">
   <button onclick="openPage('home', event)">Главная</button>
   <button onclick="openPage('review', event)">Оставить рецензию</button>
 </div>
 
-<!-- ================== PAGES ================== -->
+<!-- СТРАНИЦЫ -->
 <div id="home" class="page active"></div>
 <div id="review" class="page">
   <input type="text" id="artist" placeholder="Исполнитель">
@@ -40,7 +40,7 @@
   <button onclick="saveReview()">Сохранить рецензию</button>
 </div>
 
-<!-- ================== MODALS ================== -->
+<!-- МОДАЛКИ -->
 <div id="previewModal" class="modal">
   <div id="previewContent"></div>
   <button id="editBtn">Редактировать</button>
@@ -52,14 +52,14 @@
     <button id="tabLogin" onclick="switchAuthTab('login')">Войти</button>
     <button id="tabRegister" onclick="switchAuthTab('register')">Регистрация</button>
   </div>
-  <img id="authAvatar" src="">
+  <img id="authAvatar" src="" style="cursor:pointer;">
   <input type="text" id="authNick" placeholder="Ник">
-  <input type="file" id="authPass"> <!-- выбор аватара -->
+  <input type="file" id="authPass" style="display:none;"> <!-- выбор аватарки для регистрации -->
   <button id="loginBtnModal" onclick="authLogin()">Войти</button>
   <button id="registerBtnModal" onclick="authRegister()">Зарегистрироваться</button>
 </div>
 
-<!-- ================== PROFILE ================== -->
+<!-- PROFILE -->
 <img id="profileAvatar" src="">
 <span id="profileNick"></span>
 <button id="loginBtn" onclick="openAuthModal()">Войти</button>
@@ -77,13 +77,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ================== GLOBAL ==================
+// ---------- Global ----------
 let editingIndex=null;
 let currentUser=null;
 let currentAvatar="";
 let authTab='login';
 
-// ================== PAGES ==================
+// ---------- Pages ----------
 function openPage(id,event){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -91,7 +91,7 @@ function openPage(id,event){
   if(event) event.currentTarget.classList.add("active");
 }
 
-// ================== COVER ==================
+// ---------- Cover ----------
 const coverInput=document.getElementById("coverInput");
 coverInput.addEventListener("change", e=>{
   const reader=new FileReader();
@@ -99,13 +99,13 @@ coverInput.addEventListener("change", e=>{
   reader.readAsDataURL(e.target.files[0]);
 });
 
-// ================== PROFILE ==================
+// ---------- Profile ----------
 const profileAvatar=document.getElementById("profileAvatar");
 const profileNick=document.getElementById("profileNick");
 
-// ================== SLIDERS ==================
+// ---------- Sliders ----------
 const vibeMultipliers={1:1,2:1.0675,3:1.1349,4:1.2024,5:1.2699,6:1.3373,7:1.4048,8:1.4723,9:1.5397,10:1.6072};
-for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input", updateScore);
+for(let i=1;i<=5;i++)document.getElementById("s"+i).addEventListener("input",updateScore);
 function updateScore(){
   let base=0;
   for(let i=1;i<=4;i++){
@@ -126,7 +126,7 @@ function updateSliderProgress(slider){
 }
 updateScore();
 
-// ================== SAVE REVIEW ==================
+// ---------- Save Review ----------
 function saveReview(){
   if(!currentUser) return alert("Сначала войдите!");
   const review={
@@ -143,12 +143,12 @@ function saveReview(){
   if(editingIndex!==null){
     db.ref("reviews/"+editingIndex).set(review);
     editingIndex=null;
-  }else db.ref("reviews").push(review);
+  } else db.ref("reviews").push(review);
   resetReviewForm();
   loadReviews();
 }
 
-// ================== RESET FORM ==================
+// ---------- Reset Form ----------
 function resetReviewForm(){
   document.getElementById("coverPreview").src="";
   coverInput.value="";
@@ -160,15 +160,15 @@ function resetReviewForm(){
   updateScore();
 }
 
-// ================== LOAD REVIEWS ==================
+// ---------- Load Reviews ----------
 function loadReviews(){
   db.ref("reviews").on("value", snapshot=>{
-    const reviews=snapshot.val()||{};
+    const reviews = snapshot.val() || {};
     renderTopReviews(Object.entries(reviews));
   });
 }
 
-// ================== RENDER ==================
+// ---------- Render ----------
 function renderTopReviews(entries){
   const list=document.getElementById("home");
   list.innerHTML="";
@@ -184,7 +184,7 @@ function renderTopReviews(entries){
   });
 }
 
-// ================== MODALS ==================
+// ---------- Modal Review ----------
 const previewModal=document.getElementById("previewModal");
 const previewContent=document.getElementById("previewContent");
 const editBtn=document.getElementById("editBtn");
@@ -232,7 +232,9 @@ deleteBtn.onclick=()=>{
   previewModal.classList.remove('show');
 }
 
-// ================== AUTH MODAL ==================
+previewModal.addEventListener('click', e=>{if(e.target===previewModal) previewModal.classList.remove('show');});
+
+// ---------- Auth Modal ----------
 const authModal=document.getElementById("authModal");
 const authAvatar=document.getElementById("authAvatar");
 const authNick=document.getElementById("authNick");
@@ -242,9 +244,7 @@ const registerBtnModal=document.getElementById("registerBtnModal");
 
 function openAuthModal(){ authModal.classList.add('show'); }
 authModal.addEventListener('click', e=>{if(e.target===authModal) authModal.classList.remove('show');});
-
-// Только регистрация выбирает аватарку
-authAvatar.addEventListener("click", ()=>{if(authTab==='register') authPass.click();});
+authAvatar.addEventListener("click", ()=>{if(authTab==='register') authPass.click();}); 
 
 function switchAuthTab(tab){
   authTab=tab;
@@ -254,7 +254,7 @@ function switchAuthTab(tab){
   registerBtnModal.style.display=tab==='register'?'block':'none';
 }
 
-// ================== LOGIN ==================
+// ---------- LOGIN ----------
 function authLogin(){
   if(authTab!=='login') return;
   const nick=authNick.value.trim();
@@ -277,15 +277,13 @@ function authLogin(){
   });
 }
 
-// ================== REGISTER ==================
+// ---------- REGISTER ----------
 function authRegister(){
   if(authTab!=='register') return;
   const nick=authNick.value.trim();
-  const pass=authPass.value;
-  if(!nick||!pass) return alert("Введите ник и пароль");
-  if(nick.length<3) return alert("Ник должен быть не меньше 3 символов");
-  if(pass.length<5) return alert("Пароль должен быть не меньше 5 символов");
-
+  if(nick.length<3) return alert("Ник должен быть минимум 3 символа");
+  const pass=prompt("Введите пароль (мин. 5 символов)");
+  if(!pass || pass.length<5) return alert("Пароль должен быть минимум 5 символов");
   db.ref("users/@"+nick).get().then(snap=>{
     if(snap.exists()) return alert("Пользователь с таким ником уже существует");
     currentUser="@"+nick;
@@ -301,7 +299,7 @@ function authRegister(){
   });
 }
 
-// ================== LOGOUT ==================
+// ---------- Logout ----------
 function logout(){
   currentUser=null;
   currentAvatar="";
@@ -313,7 +311,7 @@ function logout(){
   localStorage.removeItem("avatar");
 }
 
-// ================== INIT ==================
+// ---------- Init ----------
 openPage('home');
 loadReviews();
 if(localStorage.getItem("user")){
@@ -327,5 +325,6 @@ if(localStorage.getItem("user")){
 }
 switchAuthTab('login');
 </script>
+
 </body>
 </html>
