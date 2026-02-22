@@ -517,21 +517,19 @@ function showPreview(key, r) {
   const scoreLabels = ["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"];
   const awardsLabels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
 
-  // Награды — показываем только отмеченные
   const awardsHTML = awardsLabels.map((label, j) => {
     const checked = r.awards?.[j];
-    if (!checked) return ''; // пропускаем неотмеченные
+    if (!checked) return '';
     return `<label class="award"><input type="checkbox" checked disabled> ${label}</label>`;
   }).filter(Boolean).join('');
 
-  // Оценки — проверяем наличие, подставляем 0 по умолчанию
   const scoresHTML = scoreLabels.map((label, i) => `
     <div class="block ${i===4?'vibe':''}">
       <div class="label">${label} <span>${r.scores?.[i] ?? 0}</span></div>
     </div>
   `).join('');
 
-  // Сборка содержимого модалки с лайками
+  // Сборка содержимого модалки с лайками и оценкой
   previewContent.innerHTML = `
     <div class="top">
       <div class="cover-wrapper">
@@ -549,34 +547,35 @@ function showPreview(key, r) {
         </div>
       </div>
     </div>
+
     ${scoresHTML}
+
+    <!-- Блок лайков и оценки -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:15px;">
-  
-  <div class="likes-container" style="margin:0;">
-    <button id="likeBtn">❤️</button>
-    <span id="likeCount" class="likes-count">${r.likes || 0}</span>
-  </div>
+      <div class="likes-container" style="font-size:24px;"> <!-- уменьшили шрифт -->
+        <button id="likeBtn" style="font-size:24px;">❤️</button>
+        <span id="likeCount" class="likes-count" style="font-size:24px;">${r.likes || 0}</span>
+      </div>
 
-  <div class="result" style="margin:0;">
-    <span>${r.total || 0}</span>
-    <span class="small"> / 90</span>
-  </div>
+      <div class="result">
+        <span>${r.total || 0}</span>
+        <span class="small"> / 90</span>
+      </div>
 
-  ${currentUser === "@AlexMercer" ? `
-<div style="margin-top:10px;display:flex;gap:8px;">
-  <button id="addLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(100,255,150,0.2);color:#fff;cursor:pointer;">+10</button>
-  <button id="removeLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,150,100,0.2);color:#fff;cursor:pointer;">-10</button>
-  <button id="resetLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,50,50,0.2);color:#fff;cursor:pointer;">Обнулить</button>
-</div>
-` : ''}
+      ${currentUser === "@AlexMercer" ? `
+      <div style="display:flex;gap:8px;">
+        <button id="addLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(100,255,150,0.2);color:#fff;cursor:pointer;">+10</button>
+        <button id="removeLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,150,100,0.2);color:#fff;cursor:pointer;">-10</button>
+        <button id="resetLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,50,50,0.2);color:#fff;cursor:pointer;">Обнулить</button>
+      </div>
+      ` : ''}
+    </div>
 
-</div>
-    <div class="result"><span>${r.total || 0}</span><span class="small"> / 90</span></div>
     <textarea disabled>${r.text || ''}</textarea>
   `;
 
   // Кнопки редактирования / удаления
-  const isAdmin = currentUser === "@AlexMercer"; // <-- админ
+  const isAdmin = currentUser === "@AlexMercer";
   if(isAdmin || currentUser === r.author){
     editBtn.style.display = "block";
     deleteBtn.style.display = "block";
@@ -586,82 +585,78 @@ function showPreview(key, r) {
   }
 
   // ---------- ЛАЙКИ ----------
-const likeBtn = document.getElementById("likeBtn");
-const likeCount = document.getElementById("likeCount");
+  const likeBtn = document.getElementById("likeBtn");
+  const likeCount = document.getElementById("likeCount");
+  let userLiked = r.likedBy?.includes(currentUser) || false;
 
-// Проверка, лайкнул ли текущий пользователь
-let userLiked = r.likedBy?.includes(currentUser) || false;
-
-function updateLikeButton() {
-  if(userLiked){
-    likeBtn.classList.add("liked");
-  } else {
-    likeBtn.classList.remove("liked");
+  function updateLikeButton() {
+    if(userLiked){
+      likeBtn.classList.add("liked");
+    } else {
+      likeBtn.classList.remove("liked");
+    }
   }
-}
-updateLikeButton();
-
-likeBtn.onclick = () => {
-  if(!currentUser) return showToast("Сначала войдите!","error");
-
-  userLiked = !userLiked; // toggle
-  let likedBy = r.likedBy || [];
-
-  if(userLiked){
-    likedBy.push(currentUser);
-  } else {
-    likedBy = likedBy.filter(u => u !== currentUser);
-  }
-
-  // обновляем в Firebase
-  db.ref("reviews/"+key).update({
-    likes: likedBy.length,
-    likedBy: likedBy
-  });
-
-  // ---------- ADMIN PANEL ----------
-if(currentUser === "@AlexMercer"){
-
-  const addBtn = document.getElementById("addLikesBtn");
-  const removeBtn = document.getElementById("removeLikesBtn");
-  const resetBtn = document.getElementById("resetLikesBtn");
-
-  if(addBtn){
-    addBtn.onclick = () => {
-      const newLikes = (r.likes || 0) + 10;
-      db.ref("reviews/"+key).update({likes:newLikes});
-      r.likes = newLikes;
-      likeCount.innerText = newLikes;
-      showToast("Лайки увеличены","success");
-    };
-  }
-
-  if(removeBtn){
-    removeBtn.onclick = () => {
-      const newLikes = Math.max(0,(r.likes || 0) - 10);
-      db.ref("reviews/"+key).update({likes:newLikes});
-      r.likes = newLikes;
-      likeCount.innerText = newLikes;
-      showToast("Лайки уменьшены","success");
-    };
-  }
-
-  if(resetBtn){
-    resetBtn.onclick = () => {
-      db.ref("reviews/"+key).update({likes:0, likedBy:[]});
-      r.likes = 0;
-      r.likedBy = [];
-      likeCount.innerText = 0;
-      showToast("Лайки обнулены","success");
-    };
-  }
-}
-
-  r.likes = likedBy.length;
-  r.likedBy = likedBy;
-  likeCount.innerText = r.likes;
   updateLikeButton();
-};
+
+  likeBtn.onclick = () => {
+    if(!currentUser) return showToast("Сначала войдите!","error");
+
+    userLiked = !userLiked;
+    let likedBy = r.likedBy || [];
+
+    if(userLiked){
+      likedBy.push(currentUser);
+    } else {
+      likedBy = likedBy.filter(u => u !== currentUser);
+    }
+
+    db.ref("reviews/"+key).update({
+      likes: likedBy.length,
+      likedBy: likedBy
+    });
+
+    // ---------- ADMIN PANEL ----------
+    if(currentUser === "@AlexMercer"){
+      const addBtn = document.getElementById("addLikesBtn");
+      const removeBtn = document.getElementById("removeLikesBtn");
+      const resetBtn = document.getElementById("resetLikesBtn");
+
+      if(addBtn){
+        addBtn.onclick = () => {
+          const newLikes = (r.likes || 0) + 10;
+          db.ref("reviews/"+key).update({likes:newLikes});
+          r.likes = newLikes;
+          likeCount.innerText = newLikes;
+          showToast("Лайки увеличены","success");
+        };
+      }
+
+      if(removeBtn){
+        removeBtn.onclick = () => {
+          const newLikes = Math.max(0,(r.likes || 0) - 10);
+          db.ref("reviews/"+key).update({likes:newLikes});
+          r.likes = newLikes;
+          likeCount.innerText = newLikes;
+          showToast("Лайки уменьшены","success");
+        };
+      }
+
+      if(resetBtn){
+        resetBtn.onclick = () => {
+          db.ref("reviews/"+key).update({likes:0, likedBy:[]});
+          r.likes = 0;
+          r.likedBy = [];
+          likeCount.innerText = 0;
+          showToast("Лайки обнулены","success");
+        };
+      }
+    }
+
+    r.likes = likedBy.length;
+    r.likedBy = likedBy;
+    likeCount.innerText = r.likes;
+    updateLikeButton();
+  };
 
   previewModal.classList.add('show');
 }
