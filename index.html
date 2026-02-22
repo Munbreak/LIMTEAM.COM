@@ -169,7 +169,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
-<div class="version-label">3.4</div>
+<div class="version-label">3.5</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -324,7 +324,7 @@ function showPreview(key, r) {
 
   // Показываем только выбранные номинации
   const awardsHTML = (r.awards || []).map((checked,j) => {
-    if(!checked) return '';
+    if(!checked) return '';   // пропускаем пустые
     return `<label class="award"><input type="checkbox" checked disabled> ${labels[j]}</label>`;
   }).filter(Boolean).join('');
 
