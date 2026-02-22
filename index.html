@@ -169,7 +169,7 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
-<div class="version-label">3.5</div>
+<div class="version-label">3.6</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -320,25 +320,29 @@ const deleteBtn=document.getElementById("deleteBtn");
 function showPreview(key, r) {
   currentKey = key;
 
-  const labels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
+  const scoreLabels = ["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"];
+  const awardsLabels = ["🖼 Обложка месяца","💿 Альбом месяца","🎬 Клип месяца","🏆 Альбом года"];
 
-  // Показываем только выбранные номинации
-  const awardsHTML = (r.awards || []).map((checked,j) => {
-    if(!checked) return '';   // пропускаем пустые
-    return `<label class="award"><input type="checkbox" checked disabled> ${labels[j]}</label>`;
+  // Награды — показываем только отмеченные
+  const awardsHTML = awardsLabels.map((label, j) => {
+    const checked = r.awards?.[j];
+    if (!checked) return ''; // пропускаем неотмеченные
+    return `<label class="award"><input type="checkbox" checked disabled> ${label}</label>`;
   }).filter(Boolean).join('');
 
-  // Блоки оценок без слайдеров
-  const scoreLabels = ["Рифмы / Образы","Структура / Ритмика","Реализация стиля","Индивидуальность / Харизма","Атмосфера / Вайб"];
-  const scoresHTML = (r.scores || [0,0,0,0,0]).map((s,i) => `
+  // Оценки — проверяем наличие, подставляем 0 по умолчанию
+  const scoresHTML = scoreLabels.map((label, i) => `
     <div class="block ${i===4?'vibe':''}">
-      <div class="label">${scoreLabels[i]} <span>${s}</span></div>
+      <div class="label">${label} <span>${r.scores?.[i] ?? 0}</span></div>
     </div>
   `).join('');
 
+  // Сборка содержимого модалки
   previewContent.innerHTML = `
     <div class="top">
-      <div class="cover-wrapper"><img class="cover" src="${r.cover || ''}"></div>
+      <div class="cover-wrapper">
+        <img class="cover" src="${r.cover || ''}">
+      </div>
       <div class="meta">
         <input type="text" value="${r.artist || ''}" disabled>
         <input type="text" value="${r.album || ''}" disabled>
@@ -356,6 +360,7 @@ function showPreview(key, r) {
     <textarea disabled>${r.text || ''}</textarea>
   `;
 
+  // Кнопки редактирования / удаления
   if(currentUser !== r.author){
     editBtn.style.display = "none";
     deleteBtn.style.display = "none";
