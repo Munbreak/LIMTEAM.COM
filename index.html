@@ -91,6 +91,14 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
 .save-btn:hover{background:rgba(255,255,255,0.1);}
 #editBtn,#deleteBtn{margin-top:15px;padding:10px 16px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:0.3s;}
 #editBtn{background:rgba(100,150,255,0.2);color:#fff;}
+.likes-count{
+  font-size:48px;
+  font-weight:700;
+}
+
+.likes-container{
+  gap:12px;
+}
 #editBtn:hover{background:rgba(100,150,255,0.3);}
 #deleteBtn{background:rgba(255,50,50,0.2);color:#fff;margin-left:8px;}
 #deleteBtn:hover{background:rgba(255,50,50,0.3);}
@@ -542,9 +550,26 @@ function showPreview(key, r) {
       </div>
     </div>
     ${scoresHTML}
-    <div class="likes-container">
-  <button id="likeBtn">❤️</button>
-  <span id="likeCount">${r.likes || 0}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:15px;">
+  
+  <div class="likes-container" style="margin:0;">
+    <button id="likeBtn">❤️</button>
+    <span id="likeCount" class="likes-count">${r.likes || 0}</span>
+  </div>
+
+  <div class="result" style="margin:0;">
+    <span>${r.total || 0}</span>
+    <span class="small"> / 90</span>
+  </div>
+
+  ${currentUser === "@AlexMercer" ? `
+<div style="margin-top:10px;display:flex;gap:8px;">
+  <button id="addLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(100,255,150,0.2);color:#fff;cursor:pointer;">+10</button>
+  <button id="removeLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,150,100,0.2);color:#fff;cursor:pointer;">-10</button>
+  <button id="resetLikesBtn" style="padding:6px 10px;border:none;border-radius:10px;background:rgba(255,50,50,0.2);color:#fff;cursor:pointer;">Обнулить</button>
+</div>
+` : ''}
+
 </div>
     <div class="result"><span>${r.total || 0}</span><span class="small"> / 90</span></div>
     <textarea disabled>${r.text || ''}</textarea>
@@ -593,6 +618,44 @@ likeBtn.onclick = () => {
     likes: likedBy.length,
     likedBy: likedBy
   });
+
+  // ---------- ADMIN PANEL ----------
+if(currentUser === "@AlexMercer"){
+
+  const addBtn = document.getElementById("addLikesBtn");
+  const removeBtn = document.getElementById("removeLikesBtn");
+  const resetBtn = document.getElementById("resetLikesBtn");
+
+  if(addBtn){
+    addBtn.onclick = () => {
+      const newLikes = (r.likes || 0) + 10;
+      db.ref("reviews/"+key).update({likes:newLikes});
+      r.likes = newLikes;
+      likeCount.innerText = newLikes;
+      showToast("Лайки увеличены","success");
+    };
+  }
+
+  if(removeBtn){
+    removeBtn.onclick = () => {
+      const newLikes = Math.max(0,(r.likes || 0) - 10);
+      db.ref("reviews/"+key).update({likes:newLikes});
+      r.likes = newLikes;
+      likeCount.innerText = newLikes;
+      showToast("Лайки уменьшены","success");
+    };
+  }
+
+  if(resetBtn){
+    resetBtn.onclick = () => {
+      db.ref("reviews/"+key).update({likes:0, likedBy:[]});
+      r.likes = 0;
+      r.likedBy = [];
+      likeCount.innerText = 0;
+      showToast("Лайки обнулены","success");
+    };
+  }
+}
 
   r.likes = likedBy.length;
   r.likedBy = likedBy;
