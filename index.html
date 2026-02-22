@@ -22,6 +22,16 @@ body.light .tabs button.active{background:rgba(100,150,255,0.3);}
 .menu{display:flex;flex-direction:column;width:60px;background:rgba(30,35,50,0.95);padding:20px 0;position:fixed;height:100vh;z-index:100;border-radius:0 12px 12px 0;box-shadow:2px 0 10px rgba(0,0,0,0.4);}
 .menu button{background:none;border:none;color:#aaa;font-size:20px;margin:10px 0;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:0.3s;}
 .menu button.active{color:#fff;}
+.menu button#themeBtn {
+  margin-top: auto; /* "прилипает" к низу */
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #aaa;
+  transition: 0.3s;
+}
+.menu button#themeBtn:hover {
+  color: #fff;
+}
 .menu button i{pointer-events:none;}
 .page{display:none;padding:20px;padding-left:80px;flex:1;}
 .page.active{display:block;}
@@ -142,6 +152,8 @@ textarea{width:100%;margin-top:15px;padding:12px;border-radius:14px;border:1px s
   <button class="active" onclick="openPage('home',event)"><i class="fa-solid fa-house"></i></button>
   <button onclick="openPage('review',event)"><i class="fa-solid fa-star"></i></button>
   <button onclick="openPage('profile',event)"><i class="fa-solid fa-user"></i></button>
+  <!-- Кнопка темы -->
+  <button id="themeBtn" onclick="toggleTheme()" style="margin-top:auto;"><i class="fa-solid fa-lightbulb"></i></button>
 </div>
 
 <div id="home" class="page active"></div>
